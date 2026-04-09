@@ -1,10 +1,16 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using TechnoStore.API.Middleware;
 using TechnoStore.Application.Interfaces;
 using TechnoStore.Application.Services;
 using TechnoStore.Infrastructure;
+using TechnoStore.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ===== PORT for Render =====
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5246";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 // ===== INFRASTRUCTURE (DB + JWT + Repositories) =====
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -75,6 +81,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// ===== AUTO MIGRATE + SEED =====
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TechnoStoreDbContext>();
+    db.Database.Migrate();
+    SeedData.Initialize(db);
+}
+
 // ===== MIDDLEWARE PIPELINE =====
 
 // Global Exception Handler
@@ -88,10 +102,10 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty; // Swagger at root URL
 });
 
-app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

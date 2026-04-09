@@ -91,5 +91,74 @@ namespace TechnoStore.Infrastructure.Data
 
             modelBuilder.Entity<Product>().HasData(products);
         }
+
+        public static void Initialize(TechnoStoreDbContext context)
+        {
+            // Only seed if database is empty
+            if (context.Users.Any()) return;
+
+            context.Users.AddRange(
+                new User
+                {
+                    FullName = "Admin TechnoStore",
+                    Email = "admin@technostore.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+                    Phone = "0901234567",
+                    Address = "123 Nguyen Hue, Q.1, TP.HCM",
+                    Role = "Admin",
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
+                },
+                new User
+                {
+                    FullName = "Nguyen Van Khach",
+                    Email = "customer@technostore.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Customer@123"),
+                    Phone = "0912345678",
+                    Address = "456 Le Loi, Q.3, TP.HCM",
+                    Role = "Customer",
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
+                }
+            );
+
+            context.Categories.AddRange(
+                new Category { Name = "Smartphone", Description = "Dien thoai thong minh cac hang", IsActive = true },
+                new Category { Name = "Laptop", Description = "May tinh xach tay cac hang", IsActive = true }
+            );
+            context.SaveChanges();
+
+            var cat1 = context.Categories.First(c => c.Name == "Smartphone").Id;
+            var cat2 = context.Categories.First(c => c.Name == "Laptop").Id;
+            var now = DateTime.UtcNow;
+
+            context.Products.AddRange(
+                new Product { Name = "Samsung Galaxy A16", Brand = "Samsung", Description = "Man hinh 6.7 inch Super AMOLED, RAM 8GB, ROM 128GB", Price = 4490000m, StockQuantity = 50, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Samsung Galaxy S24 FE", Brand = "Samsung", Description = "Man hinh 6.7 inch Dynamic AMOLED 2X, RAM 8GB, ROM 256GB", Price = 12990000m, StockQuantity = 30, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Samsung Galaxy S25 Ultra", Brand = "Samsung", Description = "Snapdragon 8 Elite, RAM 12GB, ROM 512GB, Camera 200MP", Price = 33990000m, StockQuantity = 20, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "iPhone 15", Brand = "Apple", Description = "Chip A16 Bionic, RAM 6GB, ROM 128GB, Dynamic Island", Price = 15990000m, StockQuantity = 40, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "iPhone 16", Brand = "Apple", Description = "Chip A18, RAM 8GB, ROM 256GB, Apple Intelligence", Price = 22490000m, StockQuantity = 35, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "iPhone 16 Pro Max", Brand = "Apple", Description = "Chip A18 Pro, ROM 512GB, Camera 48MP 5x Zoom", Price = 34490000m, StockQuantity = 25, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Redmi Note 14", Brand = "Xiaomi", Description = "AMOLED 120Hz, Dimensity 7025 Ultra, RAM 8GB", Price = 4990000m, StockQuantity = 60, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Xiaomi 15", Brand = "Xiaomi", Description = "Snapdragon 8 Elite, RAM 12GB, ROM 256GB", Price = 12990000m, StockQuantity = 25, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Xiaomi 15 Ultra", Brand = "Xiaomi", Description = "Snapdragon 8 Elite, RAM 16GB, Camera Leica 50MP", Price = 22990000m, StockQuantity = 15, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "OPPO A3", Brand = "OPPO", Description = "Snapdragon 6s Gen 1, RAM 6GB, ROM 128GB", Price = 4290000m, StockQuantity = 55, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "OPPO Reno 13", Brand = "OPPO", Description = "Dimensity 8350, RAM 12GB, ROM 256GB, Camera AI", Price = 9990000m, StockQuantity = 30, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "OPPO Find X8", Brand = "OPPO", Description = "Dimensity 9400, RAM 16GB, Camera Hasselblad", Price = 19990000m, StockQuantity = 20, CategoryId = cat1, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "ASUS VivoBook 15", Brand = "ASUS", Description = "Intel Core i5-1235U, RAM 8GB, SSD 512GB", Price = 11990000m, StockQuantity = 25, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "ASUS TUF Gaming F15", Brand = "ASUS", Description = "i7-12700H, RTX 4060, RAM 16GB, SSD 512GB", Price = 21990000m, StockQuantity = 20, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "ASUS ROG Strix G16", Brand = "ASUS", Description = "i9-14900HX, RTX 4070, RAM 32GB, SSD 1TB", Price = 39990000m, StockQuantity = 10, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Dell Inspiron 15", Brand = "Dell", Description = "Intel Core i5-1335U, RAM 8GB, SSD 256GB", Price = 12990000m, StockQuantity = 30, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Dell Latitude 5540", Brand = "Dell", Description = "i7-1365U, RAM 16GB, SSD 512GB, bao mat cao", Price = 24990000m, StockQuantity = 15, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Dell XPS 16", Brand = "Dell", Description = "Core Ultra 9, RTX 4070, OLED 3.2K, RAM 32GB", Price = 44990000m, StockQuantity = 8, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Lenovo IdeaPad 3", Brand = "Lenovo", Description = "Ryzen 5 7520U, RAM 8GB, SSD 256GB", Price = 9990000m, StockQuantity = 35, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Lenovo ThinkPad E16", Brand = "Lenovo", Description = "i7-1360P, RAM 16GB, SSD 512GB", Price = 19990000m, StockQuantity = 18, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "Lenovo Legion Pro 5", Brand = "Lenovo", Description = "Ryzen 9 7945HX, RTX 4070, RAM 32GB", Price = 41990000m, StockQuantity = 10, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "HP 15", Brand = "HP", Description = "Intel Core i3-1215U, RAM 8GB, SSD 256GB", Price = 10990000m, StockQuantity = 40, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "HP Pavilion 15", Brand = "HP", Description = "i7-1355U, RAM 16GB, SSD 512GB, thiet ke dep", Price = 17990000m, StockQuantity = 22, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now },
+                new Product { Name = "HP Omen 16", Brand = "HP", Description = "i9-13900HX, RTX 4080, QHD 165Hz, RAM 32GB", Price = 37990000m, StockQuantity = 12, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now }
+            );
+            context.SaveChanges();
+        }
     }
 }

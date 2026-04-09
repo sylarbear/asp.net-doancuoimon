@@ -17,9 +17,18 @@ namespace TechnoStore.Infrastructure
         public static IServiceCollection AddInfrastructure(
             this IServiceCollection services, IConfiguration configuration)
         {
-            // Database
-            services.AddDbContext<TechnoStoreDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            // Database - SQLite for production (Render), SQL Server for development
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            if (connectionString != null && connectionString.Contains("Data Source=") && connectionString.Contains(".db"))
+            {
+                services.AddDbContext<TechnoStoreDbContext>(options =>
+                    options.UseSqlite(connectionString));
+            }
+            else
+            {
+                services.AddDbContext<TechnoStoreDbContext>(options =>
+                    options.UseSqlServer(connectionString));
+            }
 
             // Repositories
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
