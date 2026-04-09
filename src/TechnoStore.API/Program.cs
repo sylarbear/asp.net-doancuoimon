@@ -85,7 +85,17 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<TechnoStoreDbContext>();
-    db.Database.Migrate();
+    var connStr = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
+    if (connStr.Contains(".db"))
+    {
+        // SQLite: use EnsureCreated (migrations are SQL Server specific)
+        db.Database.EnsureCreated();
+    }
+    else
+    {
+        // SQL Server: use Migrate
+        db.Database.Migrate();
+    }
     SeedData.Initialize(db);
 }
 
