@@ -16,9 +16,11 @@ export default function Header() {
       cartAPI.get().then(res => {
         const d = res.data.data;
         setCartCount(d?.totalItems || d?.items?.length || (Array.isArray(d) ? d.length : 0));
-      }).catch(() => {});
+      }).catch(() => setCartCount(0));
+    } else {
+      setCartCount(0);
     }
-  }, [user, location.pathname]);
+  }, [user, isAdmin, location.pathname]);
 
   const handleLogout = () => { logout(); navigate('/'); };
   const isActive = (path) => location.pathname === path ? 'active' : '';
@@ -45,7 +47,7 @@ export default function Header() {
             {!isAdmin && <Link to="/orders" className={isActive('/orders')}>Đơn hàng</Link>}
             {isAdmin && <Link to="/admin" className={isActive('/admin')}><DashboardOutlined /> Dashboard</Link>}
             <Link to="/profile" className={isActive('/profile')}><UserOutlined /> {user.fullName}</Link>
-            <button onClick={handleLogout}><LogoutOutlined /> Đăng xuất</button>
+            <button type="button" onClick={handleLogout}><LogoutOutlined /> Đăng xuất</button>
           </>
         ) : (
           <>

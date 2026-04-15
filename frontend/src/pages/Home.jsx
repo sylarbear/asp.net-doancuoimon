@@ -43,7 +43,7 @@ export default function Home() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
               {vouchers.map(v => (
                 <div key={v.id} className="voucher-card fade-in">
-                  <div className="voucher-discount">Giảm {v.discountValue}%</div>
+                  <div className="voucher-discount">Giảm {v.discountType === 'Percent' ? `${v.discountValue}%` : formatVND(v.discountValue)}</div>
                   <div style={{ opacity: 0.7, fontSize: 13, marginTop: 4 }}>{v.description}</div>
                   <div style={{ opacity: 0.7, fontSize: 12, marginTop: 4 }}>Đơn tối thiểu: {formatVND(v.minOrderAmount)} • Giảm tối đa: {formatVND(v.maxDiscountAmount)}</div>
                   <div className="voucher-code">{v.code}</div>

@@ -23,7 +23,7 @@ namespace TechnoStore.Application.Services
 
             var overview = new DashboardOverviewDto
             {
-                TotalRevenue = await completedOrders.SumAsync(o => o.TotalAmount),
+                TotalRevenue = await completedOrders.SumAsync(o => o.FinalAmount),
                 TotalOrders = await _unitOfWork.Orders.Query().CountAsync(),
                 TotalCustomers = await _unitOfWork.Users.Query()
                     .CountAsync(u => u.Role == "Customer"),
@@ -49,7 +49,7 @@ namespace TechnoStore.Application.Services
 
             // Load filtered data to memory for GroupBy (EF Core can't translate .Date/.ToString)
             var orders = await query
-                .Select(o => new { o.CreatedAt, o.TotalAmount })
+                .Select(o => new { o.CreatedAt, o.FinalAmount })
                 .ToListAsync();
 
             List<RevenueReportDto> report;
@@ -62,7 +62,7 @@ namespace TechnoStore.Application.Services
                         .Select(g => new RevenueReportDto
                         {
                             Date = $"{g.Key.Year}-{g.Key.Month:D2}",
-                            Revenue = g.Sum(o => o.TotalAmount),
+                            Revenue = g.Sum(o => o.FinalAmount),
                             OrderCount = g.Count()
                         })
                         .OrderBy(r => r.Date)
@@ -75,7 +75,7 @@ namespace TechnoStore.Application.Services
                         .Select(g => new RevenueReportDto
                         {
                             Date = g.Key.ToString("yyyy-MM-dd"),
-                            Revenue = g.Sum(o => o.TotalAmount),
+                            Revenue = g.Sum(o => o.FinalAmount),
                             OrderCount = g.Count()
                         })
                         .OrderBy(r => r.Date)
@@ -116,7 +116,7 @@ namespace TechnoStore.Application.Services
                 {
                     Id = g.Key.UserId,
                     Name = g.Key.FullName,
-                    TotalAmount = g.Sum(o => o.TotalAmount),
+                    TotalAmount = g.Sum(o => o.FinalAmount),
                     TotalQuantity = g.Count()
                 })
                 .OrderByDescending(t => t.TotalAmount)

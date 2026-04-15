@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Spin, Select, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
@@ -11,22 +11,29 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [categoryId, setCategoryId] = useState(searchParams.get('category') || '');
 
   useEffect(() => {
     categoryAPI.getAll().then(res => setCategories(res.data.data || []));
   }, []);
 
+  // Debounce search input - wait 400ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   useEffect(() => {
     setLoading(true);
     const params = {};
-    if (search) params.search = search;
-    if (categoryId) params.categoryId = categoryId;
+    if (debouncedSearch) params.search = debouncedSearch;
+    if (categoryId) params.categoryId = parseInt(categoryId);
     productAPI.getAll(params).then(res => {
       const pData = res.data.data;
       setProducts(Array.isArray(pData) ? pData : (pData?.data || pData?.items || []));
     }).finally(() => setLoading(false));
-  }, [search, categoryId]);
+  }, [debouncedSearch, categoryId]);
 
   return (
     <div className="app-content">
@@ -50,7 +57,7 @@ export default function Products() {
           allowClear
           style={{ minWidth: 180 }}
           size="large"
-          options={categories.map(c => ({ label: c.name, value: c.id }))}
+          options={categories.map(c => ({ label: c.name, value: String(c.id) }))}
         />
       </div>
 

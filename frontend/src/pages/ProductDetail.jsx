@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -91,7 +91,7 @@ export default function ProductDetail() {
             )}
           </div>
 
-          {product.stockQuantity > 0 && (
+          {product.stockQuantity > 0 && !isAdmin && (
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
               <InputNumber min={1} max={product.stockQuantity} value={qty} onChange={setQty} size="large" style={{ width: 100 }} />
               <Button type="primary" icon={<ShoppingCartOutlined />} size="large" loading={adding} onClick={addToCart}
@@ -107,7 +107,7 @@ export default function ProductDetail() {
       <div style={{ marginTop: 48 }}>
         <h2 className="section-title">⭐ Đánh giá sản phẩm</h2>
 
-        {user && (
+        {user && !isAdmin && (
           <div style={{ background: 'white', borderRadius: 'var(--radius)', padding: 24, marginBottom: 24, boxShadow: 'var(--shadow)' }}>
             <h3 style={{ marginBottom: 16, color: 'var(--navy)' }}>Viết đánh giá</h3>
             <Form onFinish={submitReview} layout="vertical">
