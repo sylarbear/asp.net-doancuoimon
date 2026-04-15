@@ -18,6 +18,10 @@ namespace TechnoStore.Infrastructure.Repositories
             CartItems = new GenericRepository<CartItem>(context);
             Orders = new GenericRepository<Order>(context);
             OrderDetails = new GenericRepository<OrderDetail>(context);
+            Reviews = new GenericRepository<Review>(context);
+            LoyaltyPoints = new GenericRepository<LoyaltyPoint>(context);
+            Vouchers = new GenericRepository<Voucher>(context);
+            VoucherUsages = new GenericRepository<VoucherUsage>(context);
         }
 
         public IGenericRepository<User> Users { get; }
@@ -27,6 +31,10 @@ namespace TechnoStore.Infrastructure.Repositories
         public IGenericRepository<CartItem> CartItems { get; }
         public IGenericRepository<Order> Orders { get; }
         public IGenericRepository<OrderDetail> OrderDetails { get; }
+        public IGenericRepository<Review> Reviews { get; }
+        public IGenericRepository<LoyaltyPoint> LoyaltyPoints { get; }
+        public IGenericRepository<Voucher> Vouchers { get; }
+        public IGenericRepository<VoucherUsage> VoucherUsages { get; }
 
         public async Task<int> SaveChangesAsync()
             => await _context.SaveChangesAsync();
@@ -35,3 +43,4 @@ namespace TechnoStore.Infrastructure.Repositories
             => _context.Dispose();
     }
 }
+

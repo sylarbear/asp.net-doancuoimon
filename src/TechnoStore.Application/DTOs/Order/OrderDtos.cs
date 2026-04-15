@@ -7,6 +7,11 @@ namespace TechnoStore.Application.DTOs.Order
         public int Id { get; set; }
         public string OrderCode { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
+        public string? VoucherCode { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal MemberDiscount { get; set; }
+        public decimal FinalAmount { get; set; }
+        public int PointsEarned { get; set; }
         public string Status { get; set; } = string.Empty;
         public string PaymentMethod { get; set; } = string.Empty;
         public string PaymentStatus { get; set; } = string.Empty;
@@ -48,6 +53,11 @@ namespace TechnoStore.Application.DTOs.Order
 
         [MaxLength(500)]
         public string? Note { get; set; }
+
+        public string PaymentMethod { get; set; } = "COD"; // COD or BankTransfer
+
+        [MaxLength(50)]
+        public string? VoucherCode { get; set; }
     }
 
     public class UpdateOrderStatusDto

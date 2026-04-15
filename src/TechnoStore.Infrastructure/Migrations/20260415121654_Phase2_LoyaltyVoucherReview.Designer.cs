@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TechnoStore.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using TechnoStore.Infrastructure.Data;
 namespace TechnoStore.Infrastructure.Migrations
 {
     [DbContext(typeof(TechnoStoreDbContext))]
-    partial class TechnoStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260415121654_Phase2_LoyaltyVoucherReview")]
+    partial class Phase2_LoyaltyVoucherReview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

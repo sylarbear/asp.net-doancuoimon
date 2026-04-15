@@ -159,6 +159,53 @@ namespace TechnoStore.Infrastructure.Data
                 new Product { Name = "HP Omen 16", Brand = "HP", Description = "i9-13900HX, RTX 4080, QHD 165Hz, RAM 32GB", Price = 37990000m, StockQuantity = 12, CategoryId = cat2, IsActive = true, CreatedAt = now, UpdatedAt = now }
             );
             context.SaveChanges();
+
+            // Seed Vouchers
+            context.Vouchers.AddRange(
+                new Voucher
+                {
+                    Code = "SALE15",
+                    Description = "Giam 15% cho don hang tu 5 trieu",
+                    DiscountType = "Percent",
+                    DiscountValue = 15,
+                    MinOrderAmount = 5000000m,
+                    MaxDiscountAmount = 2000000m,
+                    UsageLimit = 100,
+                    StartDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    EndDate = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc),
+                    IsActive = true,
+                    PointsCost = null // Public voucher
+                },
+                new Voucher
+                {
+                    Code = "SALE25",
+                    Description = "Giam 25% cho don hang tu 10 trieu - Doi 300 diem",
+                    DiscountType = "Percent",
+                    DiscountValue = 25,
+                    MinOrderAmount = 10000000m,
+                    MaxDiscountAmount = 2000000m,
+                    UsageLimit = 50,
+                    StartDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    EndDate = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc),
+                    IsActive = true,
+                    PointsCost = 300
+                },
+                new Voucher
+                {
+                    Code = "SALE35",
+                    Description = "Giam 35% cho don hang tu 20 trieu - Doi 500 diem",
+                    DiscountType = "Percent",
+                    DiscountValue = 35,
+                    MinOrderAmount = 20000000m,
+                    MaxDiscountAmount = 2000000m,
+                    UsageLimit = 20,
+                    StartDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    EndDate = new DateTime(2026, 12, 31, 23, 59, 59, DateTimeKind.Utc),
+                    IsActive = true,
+                    PointsCost = 500
+                }
+            );
+            context.SaveChanges();
         }
     }
 }

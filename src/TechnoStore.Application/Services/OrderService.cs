@@ -11,15 +11,17 @@ namespace TechnoStore.Application.Services
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILoyaltyService _loyaltyService;
 
-        public OrderService(IUnitOfWork unitOfWork)
+        public OrderService(IUnitOfWork unitOfWork, ILoyaltyService loyaltyService)
         {
             _unitOfWork = unitOfWork;
+            _loyaltyService = loyaltyService;
         }
 
         public async Task<ApiResponse<OrderDto>> CreateOrderAsync(int userId, CreateOrderDto dto)
         {
-            // Lấy giỏ hàng
+            // Lay gio hang
             var cartItems = await _unitOfWork.CartItems
                 .Query()
                 .Where(ci => ci.UserId == userId)
@@ -27,29 +29,86 @@ namespace TechnoStore.Application.Services
                 .ToListAsync();
 
             if (!cartItems.Any())
-                return ApiResponse<OrderDto>.ErrorResponse("Giỏ hàng trống");
+                return ApiResponse<OrderDto>.ErrorResponse("Gio hang trong");
 
-            // Kiểm tra tồn kho
+            // Kiem tra ton kho
             foreach (var item in cartItems)
             {
                 if (!item.Product.IsActive)
-                    return ApiResponse<OrderDto>.ErrorResponse($"Sản phẩm '{item.Product.Name}' không còn bán");
+                    return ApiResponse<OrderDto>.ErrorResponse($"San pham '{item.Product.Name}' khong con ban");
                 if (item.Product.StockQuantity < item.Quantity)
-                    return ApiResponse<OrderDto>.ErrorResponse($"Sản phẩm '{item.Product.Name}' chỉ còn {item.Product.StockQuantity} trong kho");
+                    return ApiResponse<OrderDto>.ErrorResponse($"San pham '{item.Product.Name}' chi con {item.Product.StockQuantity} trong kho");
             }
 
-            // Tạo mã đơn hàng
+            // Tong tien truoc giam gia
+            decimal totalAmount = cartItems.Sum(ci => ci.Product.Price * ci.Quantity);
+            decimal discountAmount = 0;
+            decimal memberDiscount = 0;
+            string? voucherCode = null;
+
+            // Ap dung voucher
+            Voucher? appliedVoucher = null;
+            if (!string.IsNullOrEmpty(dto.VoucherCode))
+            {
+                var voucher = await _unitOfWork.Vouchers.Query()
+                    .FirstOrDefaultAsync(v => v.Code == dto.VoucherCode);
+                if (voucher != null)
+                {
+                    var now = DateTime.UtcNow;
+                    if (voucher.IsActive && voucher.StartDate <= now && voucher.EndDate >= now
+                        && voucher.UsedCount < voucher.UsageLimit
+                        && totalAmount >= voucher.MinOrderAmount)
+                    {
+                        discountAmount = VoucherService.CalculateDiscount(voucher, totalAmount);
+                        voucherCode = voucher.Code;
+                        voucher.UsedCount++;
+                        appliedVoucher = voucher;
+                        _unitOfWork.Vouchers.Update(voucher);
+                    }
+                }
+            }
+
+            // Ap dung giam gia hang thanh vien
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            if (user != null)
+            {
+                decimal memberPercent = LoyaltyService.GetDiscountPercent(user.MembershipTier);
+                if (memberPercent > 0)
+                {
+                    memberDiscount = (totalAmount - discountAmount) * memberPercent / 100;
+                    // Max member discount 2,000,000
+                    memberDiscount = Math.Min(memberDiscount, 2000000m);
+                }
+            }
+
+            decimal finalAmount = totalAmount - discountAmount - memberDiscount;
+            if (finalAmount < 0) finalAmount = 0;
+
+            // Parse payment method
+            var paymentMethod = dto.PaymentMethod?.ToLower() == "banktransfer"
+                ? PaymentMethod.BankTransfer : PaymentMethod.COD;
+
+            // Tao ma don hang
             var orderCode = $"TS-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}";
 
-            // Tạo đơn hàng
+            // Points earned (based on final amount)
+            int pointsEarned = (int)(finalAmount / 100000m);
+
+            // Tao don hang
             var order = new Order
             {
                 OrderCode = orderCode,
                 UserId = userId,
-                TotalAmount = cartItems.Sum(ci => ci.Product.Price * ci.Quantity),
+                TotalAmount = totalAmount,
+                VoucherCode = voucherCode,
+                DiscountAmount = discountAmount,
+                MemberDiscount = memberDiscount,
+                FinalAmount = finalAmount,
+                PointsEarned = pointsEarned,
                 Status = OrderStatus.Pending,
-                PaymentMethod = PaymentMethod.COD,
-                PaymentStatus = PaymentStatus.Pending,
+                PaymentMethod = paymentMethod,
+                PaymentStatus = paymentMethod == PaymentMethod.BankTransfer
+                    ? PaymentStatus.Pending : PaymentStatus.Pending,
                 ShippingAddress = dto.ShippingAddress,
                 ReceiverName = dto.ReceiverName,
                 ReceiverPhone = dto.ReceiverPhone,
@@ -61,7 +120,21 @@ namespace TechnoStore.Application.Services
             await _unitOfWork.Orders.AddAsync(order);
             await _unitOfWork.SaveChangesAsync();
 
-            // Tạo chi tiết đơn hàng + trừ tồn kho
+            // Save VoucherUsage after order is created
+            if (appliedVoucher != null)
+            {
+                await _unitOfWork.VoucherUsages.AddAsync(new VoucherUsage
+                {
+                    VoucherId = appliedVoucher.Id,
+                    UserId = userId,
+                    OrderId = order.Id,
+                    DiscountAmount = discountAmount,
+                    UsedAt = DateTime.UtcNow
+                });
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            // Tao chi tiet don hang + tru ton kho
             var orderDetails = new List<OrderDetail>();
             foreach (var item in cartItems)
             {
@@ -77,18 +150,18 @@ namespace TechnoStore.Application.Services
                 orderDetails.Add(detail);
                 await _unitOfWork.OrderDetails.AddAsync(detail);
 
-                // Trừ tồn kho
+                // Tru ton kho
                 item.Product.StockQuantity -= item.Quantity;
                 _unitOfWork.Products.Update(item.Product);
             }
 
-            // Xóa giỏ hàng
+            // Xoa gio hang
             foreach (var item in cartItems)
                 _unitOfWork.CartItems.Remove(item);
 
             await _unitOfWork.SaveChangesAsync();
 
-            return ApiResponse<OrderDto>.SuccessResponse(MapToOrderDto(order, orderDetails), "Đặt hàng thành công");
+            return ApiResponse<OrderDto>.SuccessResponse(MapToOrderDto(order, orderDetails), "Dat hang thanh cong");
         }
 
         public async Task<ApiResponse<List<OrderDto>>> GetUserOrdersAsync(int userId)
@@ -113,7 +186,7 @@ namespace TechnoStore.Application.Services
                 .FirstOrDefaultAsync();
 
             if (order == null)
-                return ApiResponse<OrderDto>.ErrorResponse("Không tìm thấy đơn hàng");
+                return ApiResponse<OrderDto>.ErrorResponse("Khong tim thay don hang");
 
             return ApiResponse<OrderDto>.SuccessResponse(MapToOrderDto(order, order.OrderDetails.ToList()));
         }
@@ -127,15 +200,15 @@ namespace TechnoStore.Application.Services
                 .FirstOrDefaultAsync();
 
             if (order == null)
-                return ApiResponse<string>.ErrorResponse("Không tìm thấy đơn hàng");
+                return ApiResponse<string>.ErrorResponse("Khong tim thay don hang");
 
             if (order.Status != OrderStatus.Pending)
-                return ApiResponse<string>.ErrorResponse("Chỉ có thể hủy đơn hàng đang chờ xử lý");
+                return ApiResponse<string>.ErrorResponse("Chi co the huy don hang dang cho xu ly");
 
             order.Status = OrderStatus.Cancelled;
             order.UpdatedAt = DateTime.UtcNow;
 
-            // Hoàn lại tồn kho
+            // Hoan lai ton kho
             foreach (var detail in order.OrderDetails)
             {
                 var product = await _unitOfWork.Products.GetByIdAsync(detail.ProductId);
@@ -149,7 +222,7 @@ namespace TechnoStore.Application.Services
             _unitOfWork.Orders.Update(order);
             await _unitOfWork.SaveChangesAsync();
 
-            return ApiResponse<string>.SuccessResponse("Đã hủy đơn hàng");
+            return ApiResponse<string>.SuccessResponse("Da huy don hang");
         }
 
         // ===== ADMIN =====
@@ -183,10 +256,10 @@ namespace TechnoStore.Application.Services
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (order == null)
-                return ApiResponse<OrderDto>.ErrorResponse("Không tìm thấy đơn hàng");
+                return ApiResponse<OrderDto>.ErrorResponse("Khong tim thay don hang");
 
             if (!Enum.TryParse<OrderStatus>(dto.Status, true, out var newStatus))
-                return ApiResponse<OrderDto>.ErrorResponse("Trạng thái không hợp lệ. Các trạng thái: Pending, Confirmed, Shipping, Delivered, Completed, Cancelled");
+                return ApiResponse<OrderDto>.ErrorResponse("Trang thai khong hop le. Cac trang thai: Pending, Confirmed, Shipping, Delivered, Completed, Cancelled");
 
             // Validate status transition
             var validTransitions = new Dictionary<OrderStatus, OrderStatus[]>
@@ -203,17 +276,23 @@ namespace TechnoStore.Application.Services
                 !validTransitions[order.Status].Contains(newStatus))
             {
                 return ApiResponse<OrderDto>.ErrorResponse(
-                    $"Không thể chuyển từ '{order.Status}' sang '{newStatus}'");
+                    $"Khong the chuyen tu '{order.Status}' sang '{newStatus}'");
             }
 
             order.Status = newStatus;
             order.UpdatedAt = DateTime.UtcNow;
 
-            // COD: Khi Delivered → Paid
+            // COD: Khi Delivered -> Paid
             if (newStatus == OrderStatus.Delivered && order.PaymentMethod == PaymentMethod.COD)
                 order.PaymentStatus = PaymentStatus.Paid;
 
-            // Cancelled → Hoàn tồn kho
+            // Completed -> Tich diem loyalty
+            if (newStatus == OrderStatus.Completed)
+            {
+                await _loyaltyService.AddPointsAsync(order.UserId, order.Id, order.FinalAmount);
+            }
+
+            // Cancelled -> Hoan ton kho
             if (newStatus == OrderStatus.Cancelled)
             {
                 foreach (var detail in order.OrderDetails)
@@ -234,7 +313,7 @@ namespace TechnoStore.Application.Services
             result.CustomerName = order.User.FullName;
             result.CustomerEmail = order.User.Email;
 
-            return ApiResponse<OrderDto>.SuccessResponse(result, $"Đã cập nhật trạng thái thành '{newStatus}'");
+            return ApiResponse<OrderDto>.SuccessResponse(result, $"Da cap nhat trang thai thanh '{newStatus}'");
         }
 
         private static OrderDto MapToOrderDto(Order order, List<OrderDetail> details)
@@ -244,6 +323,11 @@ namespace TechnoStore.Application.Services
                 Id = order.Id,
                 OrderCode = order.OrderCode,
                 TotalAmount = order.TotalAmount,
+                VoucherCode = order.VoucherCode,
+                DiscountAmount = order.DiscountAmount,
+                MemberDiscount = order.MemberDiscount,
+                FinalAmount = order.FinalAmount,
+                PointsEarned = order.PointsEarned,
                 Status = order.Status.ToString(),
                 PaymentMethod = order.PaymentMethod.ToString(),
                 PaymentStatus = order.PaymentStatus.ToString(),
@@ -265,3 +349,5 @@ namespace TechnoStore.Application.Services
         }
     }
 }
+
+

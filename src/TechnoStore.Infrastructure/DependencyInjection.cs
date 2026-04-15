@@ -33,6 +33,7 @@ namespace TechnoStore.Infrastructure
             // Repositories
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<TechnoStoreDbContext>());
 
             // JWT
             services.AddScoped<IJwtTokenService, JwtTokenService>();

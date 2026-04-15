@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using TechnoStore.Domain.Entities;
+using TechnoStore.Domain.Interfaces;
 
 namespace TechnoStore.Infrastructure.Data
 {
-    public class TechnoStoreDbContext : DbContext
+    public class TechnoStoreDbContext : DbContext, IAppDbContext
     {
         public TechnoStoreDbContext(DbContextOptions<TechnoStoreDbContext> options) : base(options) { }
 
@@ -21,6 +22,10 @@ namespace TechnoStore.Infrastructure.Data
         public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderDetail> OrderDetails => Set<OrderDetail>();
+        public DbSet<Review> Reviews => Set<Review>();
+        public DbSet<LoyaltyPoint> LoyaltyPoints => Set<LoyaltyPoint>();
+        public DbSet<Voucher> Vouchers => Set<Voucher>();
+        public DbSet<VoucherUsage> VoucherUsages => Set<VoucherUsage>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -101,8 +106,68 @@ namespace TechnoStore.Infrastructure.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            // Review
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.HasOne(r => r.Product)
+                    .WithMany(p => p.Reviews)
+                    .HasForeignKey(r => r.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(r => r.User)
+                    .WithMany(u => u.Reviews)
+                    .HasForeignKey(r => r.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // One review per user per product
+                entity.HasIndex(r => new { r.UserId, r.ProductId }).IsUnique();
+            });
+
+            // LoyaltyPoint
+            modelBuilder.Entity<LoyaltyPoint>(entity =>
+            {
+                entity.HasOne(lp => lp.User)
+                    .WithMany(u => u.LoyaltyPoints)
+                    .HasForeignKey(lp => lp.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(lp => lp.Order)
+                    .WithMany()
+                    .HasForeignKey(lp => lp.OrderId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Voucher
+            modelBuilder.Entity<Voucher>(entity =>
+            {
+                entity.HasIndex(v => v.Code).IsUnique();
+            });
+
+            // VoucherUsage
+            modelBuilder.Entity<VoucherUsage>(entity =>
+            {
+                entity.HasOne(vu => vu.Voucher)
+                    .WithMany(v => v.VoucherUsages)
+                    .HasForeignKey(vu => vu.VoucherId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(vu => vu.User)
+                    .WithMany(u => u.VoucherUsages)
+                    .HasForeignKey(vu => vu.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(vu => vu.Order)
+                    .WithMany()
+                    .HasForeignKey(vu => vu.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // One voucher per user per order
+                entity.HasIndex(vu => new { vu.UserId, vu.OrderId }).IsUnique();
+            });
+
             // Seed Data
             SeedData.Seed(modelBuilder);
         }
     }
 }
+

@@ -16,6 +16,19 @@ namespace TechnoStore.Domain.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
+        // Discount fields
+        [MaxLength(50)]
+        public string? VoucherCode { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal DiscountAmount { get; set; } = 0; // Voucher discount
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal MemberDiscount { get; set; } = 0; // Membership tier discount
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal FinalAmount { get; set; } // = TotalAmount - DiscountAmount - MemberDiscount
+
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
         public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.COD;
         public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
@@ -32,6 +45,8 @@ namespace TechnoStore.Domain.Entities
         [MaxLength(500)]
         public string? Note { get; set; }
 
+        public int PointsEarned { get; set; } = 0; // Points earned from this order
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
@@ -40,3 +55,4 @@ namespace TechnoStore.Domain.Entities
         public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
     }
 }
+
