@@ -17,12 +17,15 @@ export default function Cart() {
 
   const load = () => {
     setLoading(true);
-    cartAPI.get().then(res => setItems(res.data.data || [])).finally(() => setLoading(false));
+    cartAPI.get().then(res => {
+      const cartData = res.data.data;
+      setItems(cartData?.items || (Array.isArray(cartData) ? cartData : []));
+    }).finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, []);
 
-  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const total = items.reduce((s, i) => s + (i.productPrice || i.price || 0) * i.quantity, 0);
 
   const updateQty = async (id, qty) => {
     try {
@@ -87,10 +90,10 @@ export default function Cart() {
                 <div style={{ width: 80, height: 80, background: 'var(--gray-100)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, flexShrink: 0 }}>📦</div>
                 <div style={{ flex: 1 }}>
                   <Link to={`/products/${item.productId}`} style={{ fontWeight: 600, color: 'var(--navy)', fontSize: 15 }}>{item.productName}</Link>
-                  <div style={{ color: 'var(--red)', fontWeight: 700, marginTop: 4 }}>{formatVND(item.price)}</div>
+                  <div style={{ color: 'var(--red)', fontWeight: 700, marginTop: 4 }}>{formatVND((item.productPrice || item.price))}</div>
                 </div>
                 <InputNumber min={1} max={99} value={item.quantity} onChange={v => updateQty(item.id, v)} style={{ width: 80 }} />
-                <div style={{ fontWeight: 700, color: 'var(--navy)', minWidth: 120, textAlign: 'right' }}>{formatVND(item.price * item.quantity)}</div>
+                <div style={{ fontWeight: 700, color: 'var(--navy)', minWidth: 120, textAlign: 'right' }}>{formatVND(item.subTotal || (item.productPrice || item.price) * item.quantity)}</div>
                 <Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(item.id)} />
               </div>
             ))}

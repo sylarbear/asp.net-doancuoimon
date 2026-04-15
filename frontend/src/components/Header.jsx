@@ -14,7 +14,8 @@ export default function Header() {
   useEffect(() => {
     if (user && !isAdmin) {
       cartAPI.get().then(res => {
-        if (res.data.success) setCartCount(res.data.data.length);
+        const d = res.data.data;
+        setCartCount(d?.totalItems || d?.items?.length || (Array.isArray(d) ? d.length : 0));
       }).catch(() => {});
     }
   }, [user, location.pathname]);
