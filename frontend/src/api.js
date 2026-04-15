@@ -59,7 +59,7 @@ export const orderAPI = {
   create: (data) => api.post('/orders', data),
   getAll: () => api.get('/orders'),
   getById: (id) => api.get(`/orders/${id}`),
-  cancel: (id) => api.post(`/orders/${id}/cancel`),
+  cancel: (id) => api.put(`/orders/${id}/cancel`),
 };
 
 // Vouchers
@@ -89,7 +89,7 @@ export const paymentAPI = {
 
 // Admin
 export const adminAPI = {
-  dashboard: () => api.get('/dashboard'),
+  dashboard: () => api.get('/admin/dashboard/overview'),
   getOrders: () => api.get('/orders/admin'),
   updateStatus: (id, data) => api.put(`/orders/${id}/status`, data),
   loyaltyStats: () => api.get('/admin/loyalty/stats'),

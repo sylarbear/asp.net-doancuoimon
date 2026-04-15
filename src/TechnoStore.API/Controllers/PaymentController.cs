@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TechnoStore.Application.Common;
 using TechnoStore.Domain.Enums;
-using TechnoStore.Infrastructure.Data;
+using TechnoStore.Domain.Interfaces;
 
 namespace TechnoStore.API.Controllers
 {
@@ -13,9 +13,9 @@ namespace TechnoStore.API.Controllers
     [Authorize]
     public class PaymentController : ControllerBase
     {
-        private readonly TechnoStoreDbContext _db;
+        private readonly IAppDbContext _db;
 
-        public PaymentController(TechnoStoreDbContext db)
+        public PaymentController(IAppDbContext db)
         {
             _db = db;
         }
@@ -23,7 +23,11 @@ namespace TechnoStore.API.Controllers
         [HttpGet("{orderId}/pay")]
         public async Task<IActionResult> GetPaymentPage(int orderId)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized(ApiResponse<string>.ErrorResponse("Unauthorized"));
+
+            var userId = int.Parse(userIdClaim.Value);
             var order = await _db.Orders
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
 
@@ -52,7 +56,11 @@ namespace TechnoStore.API.Controllers
         [HttpPost("{orderId}/confirm")]
         public async Task<IActionResult> ConfirmPayment(int orderId)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                return Unauthorized(ApiResponse<string>.ErrorResponse("Unauthorized"));
+
+            var userId = int.Parse(userIdClaim.Value);
             var order = await _db.Orders
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
 

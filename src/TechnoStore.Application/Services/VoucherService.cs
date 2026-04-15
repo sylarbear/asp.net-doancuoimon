@@ -21,10 +21,10 @@ namespace TechnoStore.Application.Services
             var now = DateTime.UtcNow;
             var vouchers = await _db.Vouchers
                 .Where(v => v.IsActive && v.StartDate <= now && v.EndDate >= now && v.UsedCount < v.UsageLimit)
-                .Select(v => MapToDto(v))
                 .ToListAsync();
 
-            return ApiResponse<List<VoucherDto>>.SuccessResponse(vouchers);
+            var result = vouchers.Select(v => MapToDto(v)).ToList();
+            return ApiResponse<List<VoucherDto>>.SuccessResponse(result);
         }
 
         public async Task<ApiResponse<VoucherValidationResult>> ValidateVoucherAsync(string code, decimal orderAmount)

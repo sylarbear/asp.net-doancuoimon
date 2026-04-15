@@ -56,15 +56,15 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Overview */}
       {tab === 'overview' && dashboard && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16, marginBottom: 24 }}>
             {[
               { title: 'Doanh thu', value: formatVND(dashboard.totalRevenue), icon: <DollarOutlined />, color: '#10b981' },
               { title: 'Đơn hàng', value: dashboard.totalOrders, icon: <ShoppingCartOutlined />, color: '#3b82f6' },
-              { title: 'Sản phẩm', value: dashboard.totalProducts, icon: <TrophyOutlined />, color: '#f59e0b' },
-              { title: 'Khách hàng', value: dashboard.totalCustomers, icon: <UserOutlined />, color: '#8b5cf6' },
+              { title: 'Chờ xử lý', value: dashboard.pendingOrders || 0, icon: <ShoppingCartOutlined />, color: '#f59e0b' },
+              { title: 'Sản phẩm', value: dashboard.totalProducts, icon: <TrophyOutlined />, color: '#8b5cf6' },
+              { title: 'Khách hàng', value: dashboard.totalCustomers, icon: <UserOutlined />, color: '#06b6d4' },
             ].map((s, i) => (
               <Card key={i} style={{ borderRadius: 'var(--radius)', borderLeft: `4px solid ${s.color}` }}>
                 <Statistic title={s.title} value={s.value} prefix={s.icon} valueStyle={{ color: s.color, fontWeight: 700 }} />
@@ -72,12 +72,12 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {dashboard.recentOrders?.length > 0 && (
+          {orders.length > 0 && (
             <Card title="Đơn hàng gần đây" style={{ borderRadius: 'var(--radius)' }}>
-              {dashboard.recentOrders.map(o => (
+              {orders.slice(0, 5).map(o => (
                 <div key={o.orderCode} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--gray-100)' }}>
-                  <span><strong>{o.orderCode}</strong> — {o.customerName}</span>
-                  <span><Tag color={getStatusColor(o.status)}>{getStatusText(o.status)}</Tag> {formatVND(o.totalAmount)}</span>
+                  <span><strong>{o.orderCode}</strong> — {o.customerName || 'N/A'}</span>
+                  <span><Tag color={getStatusColor(o.status)}>{getStatusText(o.status)}</Tag> {formatVND(o.finalAmount)}</span>
                 </div>
               ))}
             </Card>
