@@ -18,20 +18,28 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const res = await authAPI.login({ email, password });
-    if (res.data.success) {
-      const { token, ...userData } = res.data.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-      return { success: true };
+    try {
+      const res = await authAPI.login({ email, password });
+      if (res.data.success) {
+        const { token, ...userData } = res.data.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+        return { success: true };
+      }
+      return { success: false, message: res.data.message };
+    } catch (err) {
+      return { success: false, message: err.response?.data?.message || 'Đăng nhập thất bại' };
     }
-    return { success: false, message: res.data.message };
   };
 
   const register = async (data) => {
-    const res = await authAPI.register(data);
-    return res.data;
+    try {
+      const res = await authAPI.register(data);
+      return res.data;
+    } catch (err) {
+      return { success: false, message: err.response?.data?.message || 'Đăng ký thất bại' };
+    }
   };
 
   const logout = () => {
@@ -44,8 +52,12 @@ export function AuthProvider({ children }) {
     try {
       const res = await authAPI.profile();
       if (res.data.success) {
-        localStorage.setItem('user', JSON.stringify(res.data.data));
-        setUser(res.data.data);
+        const profileData = res.data.data;
+        // Preserve role from original login (profile API may not return role in same format)
+        const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const merged = { ...storedUser, ...profileData };
+        localStorage.setItem('user', JSON.stringify(merged));
+        setUser(merged);
       }
     } catch {}
   };

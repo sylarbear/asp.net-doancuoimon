@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { user, login, isAdmin } = useAuth();
   const navigate = useNavigate();
+
+  // Already logged in? Redirect away
+  if (user) {
+    return <Navigate to={isAdmin ? '/admin' : '/'} replace />;
+  }
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -15,7 +20,9 @@ export default function Login() {
       const result = await login(values.email, values.password);
       if (result.success) {
         message.success('Đăng nhập thành công!');
-        navigate('/');
+        // Role-based redirect
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        navigate(userData.role === 'Admin' ? '/admin' : '/');
       } else {
         message.error(result.message || 'Sai email hoặc mật khẩu');
       }
