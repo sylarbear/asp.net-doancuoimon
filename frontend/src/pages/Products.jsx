@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Spin, Select, Input } from 'antd';
+import { Spin, Select, Input, Skeleton } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { productAPI, categoryAPI } from '../api';
 import { formatVND } from '../utils';
+import { getProductImage } from '../productImages';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -40,7 +41,7 @@ export default function Products() {
       <h1 className="section-title">📱 Tất cả sản phẩm</h1>
 
       {/* Filters */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24, flexWrap: 'wrap' }}>
+      <div className="filter-bar">
         <Input
           placeholder="Tìm kiếm sản phẩm..."
           prefix={<SearchOutlined />}
@@ -62,7 +63,16 @@ export default function Products() {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>
+        <div className="product-grid">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="product-card">
+              <Skeleton.Image active style={{ width: '100%', height: 200 }} />
+              <div style={{ padding: 16 }}>
+                <Skeleton active paragraph={{ rows: 2 }} />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : products.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 80, color: 'var(--gray-500)' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
@@ -70,21 +80,24 @@ export default function Products() {
         </div>
       ) : (
         <div className="product-grid">
-          {products.map(p => (
-            <Link to={`/products/${p.id}`} key={p.id} className="product-card fade-in" style={{ textDecoration: 'none' }}>
-              <div className="card-img">
-                {p.imageUrl ? <img src={p.imageUrl} alt={p.name} /> : '📦'}
-              </div>
-              <div className="card-body">
-                <div className="card-brand">{p.brand}</div>
-                <div className="card-name">{p.name}</div>
-                <div className="card-price">{formatVND(p.price)}</div>
-                <div className="card-stock">
-                  {p.stockQuantity > 0 ? `Còn ${p.stockQuantity}` : <span style={{ color: 'var(--red)' }}>Hết hàng</span>}
+          {products.map(p => {
+            const imgUrl = getProductImage(p);
+            return (
+              <Link to={`/products/${p.id}`} key={p.id} className="product-card fade-in" style={{ textDecoration: 'none' }}>
+                <div className="card-img">
+                  {imgUrl ? <img src={imgUrl} alt={p.name} loading="lazy" /> : <span className="card-img-fallback">{p.categoryId === 2 ? '💻' : '📱'}</span>}
                 </div>
-              </div>
-            </Link>
-          ))}
+                <div className="card-body">
+                  <div className="card-brand">{p.brand}</div>
+                  <div className="card-name">{p.name}</div>
+                  <div className="card-price">{formatVND(p.price)}</div>
+                  <div className="card-stock">
+                    {p.stockQuantity > 0 ? `Còn ${p.stockQuantity}` : <span style={{ color: 'var(--red)' }}>Hết hàng</span>}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

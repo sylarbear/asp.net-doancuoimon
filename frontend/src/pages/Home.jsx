@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Spin, Tag } from 'antd';
+import { Spin, Tag, Skeleton } from 'antd';
 import { RocketOutlined, SafetyCertificateOutlined, CustomerServiceOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { productAPI, categoryAPI, voucherAPI } from '../api';
 import { formatVND } from '../utils';
+import { getProductImage } from '../productImages';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -40,7 +41,7 @@ export default function Home() {
         {vouchers.length > 0 && (
           <section style={{ marginBottom: 48 }}>
             <h2 className="section-title">🎫 Ưu đãi đang có</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            <div className="voucher-grid">
               {vouchers.map(v => (
                 <div key={v.id} className="voucher-card fade-in">
                   <div className="voucher-discount">Giảm {v.discountType === 'Percent' ? `${v.discountValue}%` : formatVND(v.discountValue)}</div>
@@ -56,17 +57,14 @@ export default function Home() {
 
         {/* Features */}
         <section style={{ marginBottom: 48 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
+          <div className="feature-grid">
             {[
               { icon: <ThunderboltOutlined />, title: 'Giao hàng nhanh', desc: 'Nhận hàng trong 24h' },
               { icon: <SafetyCertificateOutlined />, title: 'Chính hãng 100%', desc: 'Cam kết sản phẩm chính hãng' },
               { icon: <CustomerServiceOutlined />, title: 'Hỗ trợ 24/7', desc: 'Tư vấn mua hàng miễn phí' },
               { icon: <RocketOutlined />, title: 'Tích điểm đổi quà', desc: 'Mua càng nhiều ưu đãi càng lớn' },
             ].map((f, i) => (
-              <div key={i} className="fade-in" style={{
-                background: 'white', borderRadius: 'var(--radius)', padding: 24,
-                textAlign: 'center', boxShadow: 'var(--shadow)', border: '1px solid var(--gray-200)'
-              }}>
+              <div key={i} className="feature-card fade-in">
                 <div style={{ fontSize: 32, color: 'var(--accent)', marginBottom: 12 }}>{f.icon}</div>
                 <div style={{ fontWeight: 600, color: 'var(--navy)', marginBottom: 4 }}>{f.title}</div>
                 <div style={{ fontSize: 13, color: 'var(--gray-500)' }}>{f.desc}</div>
@@ -77,27 +75,39 @@ export default function Home() {
 
         {/* Products */}
         <section>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
             <h2 className="section-title" style={{ margin: 0 }}>📱 Sản phẩm nổi bật</h2>
             <Link to="/products" className="btn-outline">Xem tất cả →</Link>
           </div>
           {loading ? (
-            <div style={{ textAlign: 'center', padding: 60 }}><Spin size="large" /></div>
+            <div className="product-grid">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="product-card">
+                  <Skeleton.Image active style={{ width: '100%', height: 200 }} />
+                  <div style={{ padding: 16 }}>
+                    <Skeleton active paragraph={{ rows: 2 }} />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="product-grid">
-              {products.slice(0, 8).map(p => (
-                <Link to={`/products/${p.id}`} key={p.id} className="product-card fade-in" style={{ textDecoration: 'none' }}>
-                  <div className="card-img">
-                    {p.imageUrl ? <img src={p.imageUrl} alt={p.name} /> : '📦'}
-                  </div>
-                  <div className="card-body">
-                    <div className="card-brand">{p.brand}</div>
-                    <div className="card-name">{p.name}</div>
-                    <div className="card-price">{formatVND(p.price)}</div>
-                    <div className="card-stock">Còn {p.stockQuantity} sản phẩm</div>
-                  </div>
-                </Link>
-              ))}
+              {products.slice(0, 8).map(p => {
+                const imgUrl = getProductImage(p);
+                return (
+                  <Link to={`/products/${p.id}`} key={p.id} className="product-card fade-in" style={{ textDecoration: 'none' }}>
+                    <div className="card-img">
+                      {imgUrl ? <img src={imgUrl} alt={p.name} loading="lazy" /> : <span className="card-img-fallback">{p.categoryId === 2 ? '💻' : '📱'}</span>}
+                    </div>
+                    <div className="card-body">
+                      <div className="card-brand">{p.brand}</div>
+                      <div className="card-name">{p.name}</div>
+                      <div className="card-price">{formatVND(p.price)}</div>
+                      <div className="card-stock">Còn {p.stockQuantity} sản phẩm</div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </section>

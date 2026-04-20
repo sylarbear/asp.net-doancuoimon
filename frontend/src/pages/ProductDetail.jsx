@@ -5,6 +5,7 @@ import { ShoppingCartOutlined, ArrowLeftOutlined, StarFilled } from '@ant-design
 import { productAPI, cartAPI, reviewAPI } from '../api';
 import { formatVND } from '../utils';
 import { useAuth } from '../context/AuthContext';
+import { getProductImage } from '../productImages';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -36,6 +37,8 @@ export default function ProductDetail() {
     try {
       await cartAPI.add({ productId: parseInt(id), quantity: qty });
       message.success('Đã thêm vào giỏ hàng!');
+      // Dispatch event so Header can update cart badge in realtime
+      window.dispatchEvent(new Event('cart-updated'));
     } catch (err) {
       message.error(err.response?.data?.message || 'Lỗi thêm giỏ hàng');
     }
@@ -57,14 +60,20 @@ export default function ProductDetail() {
   if (loading) return <div style={{ textAlign: 'center', padding: 100 }}><Spin size="large" /></div>;
   if (!product) return <div style={{ textAlign: 'center', padding: 100 }}>Sản phẩm không tồn tại</div>;
 
+  const imgUrl = getProductImage(product);
+
   return (
     <div className="app-content fade-in">
       <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} style={{ marginBottom: 16 }}>Quay lại</Button>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, background: 'white', borderRadius: 'var(--radius)', padding: 32, boxShadow: 'var(--shadow)' }}>
+      <div className="product-detail-grid">
         {/* Image */}
-        <div style={{ background: 'var(--gray-100)', borderRadius: 12, height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 80, color: 'var(--accent)' }}>
-          {product.imageUrl ? <img src={product.imageUrl} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : '📦'}
+        <div className="product-detail-image">
+          {imgUrl ? (
+            <img src={imgUrl} alt={product.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+          ) : (
+            <span style={{ fontSize: 100, opacity: 0.3 }}>{product.categoryId === 2 ? '💻' : '📱'}</span>
+          )}
         </div>
 
         {/* Info */}
@@ -92,7 +101,7 @@ export default function ProductDetail() {
           </div>
 
           {product.stockQuantity > 0 && !isAdmin && (
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
               <InputNumber min={1} max={product.stockQuantity} value={qty} onChange={setQty} size="large" style={{ width: 100 }} />
               <Button type="primary" icon={<ShoppingCartOutlined />} size="large" loading={adding} onClick={addToCart}
                 style={{ height: 48, paddingInline: 32, borderRadius: 10, fontWeight: 600, background: 'var(--accent)' }}>

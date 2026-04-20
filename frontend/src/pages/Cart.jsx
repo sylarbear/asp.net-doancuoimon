@@ -4,6 +4,7 @@ import { Button, InputNumber, Spin, message, Empty, Input, Select, Divider } fro
 import { DeleteOutlined, ShoppingOutlined, TagOutlined } from '@ant-design/icons';
 import { cartAPI, orderAPI, voucherAPI } from '../api';
 import { formatVND } from '../utils';
+import { getProductImage } from '../productImages';
 
 export default function Cart() {
   const [items, setItems] = useState([]);
@@ -31,6 +32,7 @@ export default function Cart() {
     try {
       await cartAPI.update(id, { quantity: qty });
       load();
+      window.dispatchEvent(new Event('cart-updated'));
     } catch (err) { message.error('Lỗi cập nhật'); }
   };
 
@@ -38,6 +40,7 @@ export default function Cart() {
     await cartAPI.remove(id);
     message.success('Đã xóa');
     load();
+    window.dispatchEvent(new Event('cart-updated'));
   };
 
   const validateVoucher = async () => {
@@ -62,6 +65,7 @@ export default function Cart() {
       const res = await orderAPI.create(data);
       if (res.data.success) {
         message.success('Đặt hàng thành công!');
+        window.dispatchEvent(new Event('cart-updated'));
         navigate('/orders');
       } else {
         message.error(res.data.message);
@@ -82,25 +86,35 @@ export default function Cart() {
           <Link to="/products"><Button type="primary" style={{ marginTop: 16, background: 'var(--accent)' }}>Mua sắm ngay</Button></Link>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 24 }}>
+        <div className="cart-layout">
           {/* Items */}
           <div>
-            {items.map(item => (
-              <div key={item.id} style={{ background: 'white', borderRadius: 'var(--radius)', padding: 20, marginBottom: 12, boxShadow: 'var(--shadow)', display: 'flex', gap: 16, alignItems: 'center' }}>
-                <div style={{ width: 80, height: 80, background: 'var(--gray-100)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, flexShrink: 0 }}>📦</div>
-                <div style={{ flex: 1 }}>
-                  <Link to={`/products/${item.productId}`} style={{ fontWeight: 600, color: 'var(--navy)', fontSize: 15 }}>{item.productName}</Link>
-                  <div style={{ color: 'var(--red)', fontWeight: 700, marginTop: 4 }}>{formatVND((item.productPrice || item.price))}</div>
+            {items.map(item => {
+              // Infer brand from product name for SVG styling
+              const knownBrands = ['Samsung', 'Apple', 'iPhone', 'Xiaomi', 'Redmi', 'OPPO', 'ASUS', 'Dell', 'Lenovo', 'HP'];
+              const inferredBrand = knownBrands.find(b => item.productName?.toLowerCase().includes(b.toLowerCase()));
+              const brand = inferredBrand === 'iPhone' || inferredBrand === 'Redmi' ? (inferredBrand === 'iPhone' ? 'Apple' : 'Xiaomi') : inferredBrand;
+              const isLaptop = ['ASUS', 'Dell', 'Lenovo', 'HP'].includes(brand);
+              const imgUrl = getProductImage({ name: item.productName, brand: brand || '', categoryId: isLaptop ? 2 : 1 });
+              return (
+                <div key={item.id} className="cart-item">
+                  <div className="cart-item-img">
+                    {imgUrl ? <img src={imgUrl} alt={item.productName} /> : '📦'}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Link to={`/products/${item.productId}`} style={{ fontWeight: 600, color: 'var(--navy)', fontSize: 15 }}>{item.productName}</Link>
+                    <div style={{ color: 'var(--red)', fontWeight: 700, marginTop: 4 }}>{formatVND((item.productPrice || item.price))}</div>
+                  </div>
+                  <InputNumber min={1} max={99} value={item.quantity} onChange={v => updateQty(item.id, v)} style={{ width: 80 }} />
+                  <div className="cart-item-total">{formatVND(item.subTotal || (item.productPrice || item.price) * item.quantity)}</div>
+                  <Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(item.id)} />
                 </div>
-                <InputNumber min={1} max={99} value={item.quantity} onChange={v => updateQty(item.id, v)} style={{ width: 80 }} />
-                <div style={{ fontWeight: 700, color: 'var(--navy)', minWidth: 120, textAlign: 'right' }}>{formatVND(item.subTotal || (item.productPrice || item.price) * item.quantity)}</div>
-                <Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(item.id)} />
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Summary */}
-          <div style={{ background: 'white', borderRadius: 'var(--radius)', padding: 24, boxShadow: 'var(--shadow)', height: 'fit-content', position: 'sticky', top: 92 }}>
+          <div className="cart-summary">
             <h3 style={{ color: 'var(--navy)', marginBottom: 16 }}>Tóm tắt đơn hàng</h3>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
               <span>Tạm tính</span><strong>{formatVND(total)}</strong>
