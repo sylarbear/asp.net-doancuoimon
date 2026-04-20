@@ -72,9 +72,13 @@ export default function Orders() {
         okText: '✅ Đã thanh toán',
         cancelText: 'Đóng',
         onOk: async () => {
-          await paymentAPI.confirm(orderId);
-          message.success('Thanh toán thành công!');
-          load();
+          try {
+            await paymentAPI.confirm(orderId);
+            message.success('Thanh toán thành công!');
+            load();
+          } catch (e) {
+            message.error(e.response?.data?.message || 'Lỗi xác nhận thanh toán');
+          }
         }
       });
     } catch (err) { message.error(err.response?.data?.message || 'Lỗi'); }

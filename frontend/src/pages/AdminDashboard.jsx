@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Spin, Tag, Table, Select, Statistic, message, Button, Modal, Form, Input, InputNumber, Popconfirm, DatePicker, Switch } from 'antd';
+import { Card, Spin, Tag, Table, Select, Statistic, message, Button, Modal, Form, Input, InputNumber, Popconfirm, DatePicker } from 'antd';
 import { ShoppingCartOutlined, UserOutlined, DollarOutlined, TrophyOutlined, TeamOutlined, PlusOutlined, EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { adminAPI, productAPI, categoryAPI } from '../api';
@@ -99,6 +99,7 @@ export default function AdminDashboard() {
     try {
       const data = {
         ...values,
+        code: values.code?.toUpperCase(),
         startDate: values.startDate?.toISOString(),
         endDate: values.endDate?.toISOString(),
       };

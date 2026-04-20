@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Card, Spin, Tag, Progress, Timeline, Empty, Button, Form, Input, message, Modal } from 'antd';
+import { Card, Spin, Tag, Progress, Timeline, Empty, Button, Form, Input, message } from 'antd';
 import { EditOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext';
 import { loyaltyAPI, authAPI } from '../api';
-import { formatVND, getTierConfig } from '../utils';
+import { getTierConfig } from '../utils';
 
 export default function Profile() {
   const { user, refreshProfile } = useAuth();

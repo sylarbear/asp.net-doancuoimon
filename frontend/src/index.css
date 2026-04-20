@@ -718,6 +718,10 @@ body {
 
   /* Profile - stack columns on mobile */
   .profile-grid { grid-template-columns: 1fr !important; }
+
+  /* Admin dashboard - stack chart columns */
+  .app-content div[style*="grid-template-columns: 2fr 1fr"] { grid-template-columns: 1fr !important; }
+  .admin-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 /* Small phone (max 480px) */
