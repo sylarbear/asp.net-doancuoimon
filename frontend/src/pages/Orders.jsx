@@ -130,7 +130,7 @@ export default function Orders() {
             })}
 
             {/* Shipping info */}
-            {o.shippingAddress && (
+            {o.shippingAddress && o.status !== 'Cancelled' && (
               <div style={{ margin: '12px 0', padding: '10px 14px', background: 'var(--gray-50)', borderRadius: 8, fontSize: 13, color: 'var(--gray-500)' }}>
                 📍 {o.receiverName} • {o.receiverPhone} • {o.shippingAddress}
               </div>

@@ -120,7 +120,7 @@ export default function ProductDetail() {
           <div style={{ background: 'white', borderRadius: 'var(--radius)', padding: 24, marginBottom: 24, boxShadow: 'var(--shadow)' }}>
             <h3 style={{ marginBottom: 16, color: 'var(--navy)' }}>Viết đánh giá</h3>
             <Form onFinish={submitReview} layout="vertical">
-              <Form.Item name="rating" rules={[{ required: true, message: 'Chọn số sao' }]}>
+              <Form.Item name="rating" rules={[{ required: true, message: 'Chọn số sao' }, { type: 'number', min: 1, message: 'Chọn ít nhất 1 sao' }]}>
                 <Rate style={{ fontSize: 24 }} />
               </Form.Item>
               <Form.Item name="comment">

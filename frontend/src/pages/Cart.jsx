@@ -26,21 +26,26 @@ export default function Cart() {
 
   useEffect(() => { load(); }, []);
 
-  const total = items.reduce((s, i) => s + (i.productPrice || i.price || 0) * i.quantity, 0);
+  const total = items.reduce((s, i) => s + (Number(i.productPrice) || Number(i.price) || 0) * (i.quantity || 1), 0);
 
   const updateQty = async (id, qty) => {
+    if (!qty || qty < 1) return;
     try {
       await cartAPI.update(id, { quantity: qty });
       load();
       window.dispatchEvent(new Event('cart-updated'));
-    } catch (err) { message.error('Lỗi cập nhật'); }
+    } catch (err) { message.error('Lỗi cập nhật số lượng'); }
   };
 
   const remove = async (id) => {
-    await cartAPI.remove(id);
-    message.success('Đã xóa');
-    load();
-    window.dispatchEvent(new Event('cart-updated'));
+    try {
+      await cartAPI.remove(id);
+      message.success('Đã xóa khỏi giỏ hàng');
+      load();
+      window.dispatchEvent(new Event('cart-updated'));
+    } catch (err) {
+      message.error('Lỗi xóa sản phẩm');
+    }
   };
 
   const validateVoucher = async () => {

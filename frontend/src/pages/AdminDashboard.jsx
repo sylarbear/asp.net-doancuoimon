@@ -211,7 +211,9 @@ export default function AdminDashboard() {
               </Form.Item>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <Form.Item name="brand" label="Thương hiệu" rules={[{ required: true, message: 'Nhập thương hiệu' }]}>
-                  <Select placeholder="Chọn" options={['Samsung', 'Apple', 'Xiaomi', 'OPPO', 'ASUS', 'Dell', 'Lenovo', 'HP'].map(b => ({ label: b, value: b }))} />
+                  <Select placeholder="Chọn hoặc nhập mới" showSearch allowClear
+                    options={['Samsung', 'Apple', 'Xiaomi', 'OPPO', 'ASUS', 'Dell', 'Lenovo', 'HP', 'Acer', 'MSI'].map(b => ({ label: b, value: b }))}
+                    filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())} />
                 </Form.Item>
                 <Form.Item name="categoryId" label="Danh mục" rules={[{ required: true, message: 'Chọn danh mục' }]}>
                   <Select placeholder="Chọn" options={categories.map(c => ({ label: c.name, value: c.id }))} />
