@@ -1,7 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Spin, Tag, Empty, Button, message, Modal } from 'antd';
+import { Spin, Tag, Empty, Button, message, Modal, Steps } from 'antd';
 import { orderAPI, paymentAPI } from '../api';
 import { formatVND, getStatusColor, getStatusText } from '../utils';
+import { getProductImage } from '../productImages';
+
+const statusSteps = ['Pending', 'Confirmed', 'Shipping', 'Delivered', 'Completed'];
+
+function OrderStatusTracker({ status }) {
+  const currentStep = statusSteps.indexOf(status);
+  if (status === 'Cancelled') {
+    return <Tag color="red" style={{ fontSize: 14, padding: '4px 16px' }}>❌ Đã hủy</Tag>;
+  }
+  return (
+    <Steps
+      size="small"
+      current={currentStep}
+      items={statusSteps.map(s => ({
+        title: getStatusText(s),
+      }))}
+      style={{ marginBottom: 16 }}
+    />
+  );
+}
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -64,31 +84,57 @@ export default function Orders() {
 
   return (
     <div className="app-content fade-in">
-      <h1 className="section-title">📋 Đơn hàng của tôi</h1>
+      <h1 className="section-title">📋 Đơn hàng của tôi ({orders.length})</h1>
 
       {orders.length === 0 ? (
         <Empty description="Chưa có đơn hàng nào" />
       ) : (
         orders.map(o => (
-          <div key={o.id} style={{ background: 'white', borderRadius: 'var(--radius)', padding: 24, marginBottom: 16, boxShadow: 'var(--shadow)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div key={o.id} className="order-card">
+            {/* Header */}
+            <div className="order-header">
               <div>
                 <strong style={{ color: 'var(--navy)', fontSize: 16 }}>{o.orderCode}</strong>
                 <div style={{ fontSize: 13, color: 'var(--gray-500)', marginTop: 2 }}>{new Date(o.createdAt).toLocaleString('vi-VN')}</div>
               </div>
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <Tag color={getStatusColor(o.status)}>{getStatusText(o.status)}</Tag>
                 <Tag color={o.paymentStatus === 'Paid' ? 'green' : 'orange'}>{o.paymentStatus === 'Paid' ? '✓ Đã TT' : 'Chưa TT'}</Tag>
+                <Tag>{o.paymentMethod === 'COD' ? '💵 COD' : '🏦 CK'}</Tag>
               </div>
             </div>
 
-            {/* Items */}
-            {o.orderDetails.map((d, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--gray-100)' }}>
-                <span>{d.productName} × {d.quantity}</span>
-                <span style={{ fontWeight: 600 }}>{formatVND(d.subTotal)}</span>
+            {/* Status tracker */}
+            {o.status !== 'Cancelled' && <OrderStatusTracker status={o.status} />}
+
+            {/* Items with images */}
+            {o.orderDetails.map((d, i) => {
+              const knownBrands = ['Samsung', 'Apple', 'iPhone', 'Xiaomi', 'Redmi', 'OPPO', 'ASUS', 'Dell', 'Lenovo', 'HP'];
+              const found = knownBrands.find(b => d.productName?.toLowerCase().includes(b.toLowerCase()));
+              const brand = found === 'iPhone' ? 'Apple' : found === 'Redmi' ? 'Xiaomi' : found;
+              const isLaptop = ['ASUS', 'Dell', 'Lenovo', 'HP'].includes(brand);
+              const imgUrl = getProductImage({ name: d.productName, brand: brand || '', categoryId: isLaptop ? 2 : 1 });
+              
+              return (
+                <div key={i} className="order-item">
+                  <div className="order-item-img">
+                    {imgUrl ? <img src={imgUrl} alt={d.productName} /> : '📦'}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{d.productName}</div>
+                    <div style={{ fontSize: 13, color: 'var(--gray-500)' }}>SL: {d.quantity} × {formatVND(d.unitPrice)}</div>
+                  </div>
+                  <div style={{ fontWeight: 700, color: 'var(--navy)', whiteSpace: 'nowrap' }}>{formatVND(d.subTotal)}</div>
+                </div>
+              );
+            })}
+
+            {/* Shipping info */}
+            {o.shippingAddress && (
+              <div style={{ margin: '12px 0', padding: '10px 14px', background: 'var(--gray-50)', borderRadius: 8, fontSize: 13, color: 'var(--gray-500)' }}>
+                📍 {o.receiverName} • {o.receiverPhone} • {o.shippingAddress}
               </div>
-            ))}
+            )}
 
             {/* Totals */}
             <div style={{ marginTop: 12, padding: '12px 0', borderTop: '2px solid var(--gray-200)' }}>
@@ -105,7 +151,7 @@ export default function Orders() {
                   <span>Ưu đãi thành viên</span><span>-{formatVND(o.memberDiscount)}</span>
                 </div>
               )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 16, marginTop: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 18, marginTop: 8 }}>
                 <span>Tổng thanh toán</span><span style={{ color: 'var(--red)' }}>{formatVND(o.finalAmount)}</span>
               </div>
               {o.pointsEarned > 0 && o.status === 'Completed' && (
