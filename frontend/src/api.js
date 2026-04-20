@@ -36,6 +36,7 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   register: (data) => api.post('/auth/register', data),
   profile: () => api.get('/auth/profile'),
+  updateProfile: (data) => api.put('/auth/profile', data),
 };
 
 // Products
@@ -105,6 +106,11 @@ export const adminAPI = {
   createProduct: (data) => api.post('/products', data),
   updateProduct: (id, data) => api.put(`/products/${id}`, data),
   deleteProduct: (id) => api.delete(`/products/${id}`),
+  // Voucher CRUD
+  getVouchers: () => api.get('/vouchers/available'),
+  createVoucher: (data) => api.post('/admin/vouchers', data),
+  updateVoucher: (id, data) => api.put(`/admin/vouchers/${id}`, data),
+  deleteVoucher: (id) => api.delete(`/admin/vouchers/${id}`),
 };
 
 export default api;

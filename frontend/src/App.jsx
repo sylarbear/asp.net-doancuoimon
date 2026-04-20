@@ -13,6 +13,7 @@ import Cart from './pages/Cart';
 import Orders from './pages/Orders';
 import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
+import NotFound from './pages/NotFound';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -43,6 +44,7 @@ function AppContent() {
           <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </ErrorBoundary>
       <footer className="app-footer">

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Card, Spin, Tag, Progress, Timeline, Empty } from 'antd';
-import { CrownOutlined, StarOutlined, TrophyOutlined, GiftOutlined } from '@ant-design/icons';
+import { Card, Spin, Tag, Progress, Timeline, Empty, Button, Form, Input, message, Modal } from 'antd';
+import { EditOutlined, SaveOutlined } from '@ant-design/icons';
 import { useAuth } from '../context/AuthContext';
-import { loyaltyAPI } from '../api';
+import { loyaltyAPI, authAPI } from '../api';
 import { formatVND, getTierConfig } from '../utils';
 
 export default function Profile() {
@@ -10,6 +10,9 @@ export default function Profile() {
   const [loyalty, setLoyalty] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form] = Form.useForm();
 
   useEffect(() => {
     refreshProfile();
@@ -21,6 +24,28 @@ export default function Profile() {
       setHistory(hRes.data.data || []);
     }).finally(() => setLoading(false));
   }, []);
+
+  const handleSave = async (values) => {
+    setSaving(true);
+    try {
+      await authAPI.updateProfile(values);
+      message.success('Cập nhật thông tin thành công!');
+      await refreshProfile();
+      setEditing(false);
+    } catch (err) {
+      message.error(err.response?.data?.message || 'Lỗi cập nhật');
+    }
+    setSaving(false);
+  };
+
+  const startEdit = () => {
+    form.setFieldsValue({
+      fullName: user?.fullName || '',
+      phone: user?.phone || '',
+      address: user?.address || '',
+    });
+    setEditing(true);
+  };
 
   if (loading) return <div style={{ textAlign: 'center', padding: 100 }}><Spin size="large" /></div>;
 
@@ -43,16 +68,38 @@ export default function Profile() {
             <div style={{ width: 64, height: 64, borderRadius: '50%', background: `linear-gradient(135deg, var(--navy), var(--accent))`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, color: 'white', fontWeight: 700 }}>
               {user?.fullName?.charAt(0)}
             </div>
-            <div>
+            <div style={{ flex: 1 }}>
               <h2 style={{ margin: 0, color: 'var(--navy)' }}>{user?.fullName}</h2>
               <div style={{ color: 'var(--gray-500)' }}>{user?.email}</div>
             </div>
+            {!editing && (
+              <Button icon={<EditOutlined />} onClick={startEdit} type="text" style={{ color: 'var(--accent)' }}>Sửa</Button>
+            )}
           </div>
-          <div style={{ display: 'grid', gap: 12 }}>
-            <div><strong>📞 Điện thoại:</strong> {user?.phone || 'Chưa cập nhật'}</div>
-            <div><strong>📍 Địa chỉ:</strong> {user?.address || 'Chưa cập nhật'}</div>
-            <div><strong>📅 Ngày tham gia:</strong> {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : ''}</div>
-          </div>
+
+          {editing ? (
+            <Form form={form} layout="vertical" onFinish={handleSave}>
+              <Form.Item name="fullName" label="Họ tên" rules={[{ required: true, message: 'Nhập họ tên' }]}>
+                <Input />
+              </Form.Item>
+              <Form.Item name="phone" label="Điện thoại">
+                <Input />
+              </Form.Item>
+              <Form.Item name="address" label="Địa chỉ">
+                <Input.TextArea rows={2} />
+              </Form.Item>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <Button onClick={() => setEditing(false)}>Hủy</Button>
+                <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={saving} style={{ background: 'var(--accent)' }}>Lưu</Button>
+              </div>
+            </Form>
+          ) : (
+            <div style={{ display: 'grid', gap: 12 }}>
+              <div><strong>📞 Điện thoại:</strong> {user?.phone || 'Chưa cập nhật'}</div>
+              <div><strong>📍 Địa chỉ:</strong> {user?.address || 'Chưa cập nhật'}</div>
+              <div><strong>📅 Ngày tham gia:</strong> {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : ''}</div>
+            </div>
+          )}
         </Card>
 
         {/* Loyalty */}
