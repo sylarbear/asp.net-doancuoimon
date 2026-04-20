@@ -55,7 +55,7 @@ export default class ErrorBoundary extends Component {
               🏠 Về trang chủ
             </button>
           </div>
-          {process.env.NODE_ENV === 'development' && this.state.error && (
+          {import.meta.env.DEV && this.state.error && (
             <pre style={{
               marginTop: 24, padding: 16, background: '#fef2f2', borderRadius: 8,
               fontSize: 12, color: '#991b1b', maxWidth: 600, overflow: 'auto', textAlign: 'left',

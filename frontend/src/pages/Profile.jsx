@@ -73,7 +73,7 @@ export default function Profile() {
               <div style={{ color: 'var(--gray-500)' }}>{user?.email}</div>
             </div>
             {!editing && (
-              <Button icon={<EditOutlined />} onClick={startEdit} type="text" style={{ color: 'var(--accent)' }}>Sửa</Button>
+              <Button icon={<EditOutlined />} onClick={startEdit} style={{ color: 'var(--accent)', borderColor: 'var(--accent)', borderRadius: 8 }}>Sửa</Button>
             )}
           </div>
 
