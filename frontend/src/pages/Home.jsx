@@ -98,6 +98,11 @@ export default function Home() {
                   <Link to={`/products/${p.id}`} key={p.id} className="product-card fade-in" style={{ textDecoration: 'none' }}>
                     <div className="card-img">
                       {imgUrl ? <img src={imgUrl} alt={p.name} loading="lazy" /> : <span className="card-img-fallback">{p.categoryId === 2 ? '💻' : '📱'}</span>}
+                      <div className="card-badges">
+                        {p.stockQuantity === 0 && <span className="badge badge-out">Hết hàng</span>}
+                        {p.stockQuantity > 0 && p.stockQuantity <= 5 && <span className="badge badge-hot">Sắp hết</span>}
+                        {p.price >= 20000000 && <span className="badge badge-premium">Premium</span>}
+                      </div>
                     </div>
                     <div className="card-body">
                       <div className="card-brand">{p.brand}</div>

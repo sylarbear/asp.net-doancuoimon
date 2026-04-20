@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCartOutlined, UserOutlined, LogoutOutlined, DashboardOutlined, HomeOutlined, AppstoreOutlined, MenuOutlined, CloseOutlined } from '@ant-design/icons';
+import { ShoppingCartOutlined, UserOutlined, LogoutOutlined, DashboardOutlined, HomeOutlined, AppstoreOutlined, MenuOutlined, CloseOutlined, SearchOutlined } from '@ant-design/icons';
 import { Badge } from 'antd';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect, useCallback } from 'react';
@@ -11,6 +11,7 @@ export default function Header() {
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [headerSearch, setHeaderSearch] = useState('');
 
   const fetchCart = useCallback(() => {
     if (user && !isAdmin) {
@@ -51,6 +52,24 @@ export default function Header() {
           <div className="logo-icon">T</div>
           TechnoStore
         </Link>
+
+        {/* Search bar */}
+        <div className="header-search">
+          <SearchOutlined className="header-search-icon" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm sản phẩm..."
+            value={headerSearch}
+            onChange={e => setHeaderSearch(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && headerSearch.trim()) {
+                navigate(`/products?search=${encodeURIComponent(headerSearch.trim())}`);
+                setHeaderSearch('');
+                setMobileOpen(false);
+              }
+            }}
+          />
+        </div>
 
         {/* Mobile hamburger */}
         <button 

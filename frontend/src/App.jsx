@@ -48,7 +48,34 @@ function AppContent() {
         </Routes>
       </ErrorBoundary>
       <footer className="app-footer">
-        <p>© 2026 TechnoStore. Tất cả quyền được bảo lưu.</p>
+        <div className="footer-grid">
+          <div>
+            <h4>🏪 TechnoStore</h4>
+            <p>Hệ thống bán lẻ điện thoại, laptop chính hãng. Cam kết giá tốt, sản phẩm chất lượng.</p>
+            <p>📍 123 Nguyễn Văn Linh, TP.HCM</p>
+            <p>📞 1900 1234</p>
+          </div>
+          <div>
+            <h4>Hỗ trợ khách hàng</h4>
+            <p>Chính sách đổi trả 30 ngày</p>
+            <p>Bảo hành chính hãng 12 tháng</p>
+            <p>Giao hàng toàn quốc</p>
+            <p>Hỗ trợ trả góp 0%</p>
+          </div>
+          <div>
+            <h4>Thanh toán & Vận chuyển</h4>
+            <div className="footer-payments">
+              <span>💵 COD</span>
+              <span>🏦 Chuyển khoản</span>
+              <span>💳 VISA/Master</span>
+            </div>
+            <p style={{marginTop: 12}}>🚚 Giao hàng nhanh 2h (nội thành)</p>
+            <p>📦 Giao tiêu chuẩn 1-3 ngày</p>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>© 2026 TechnoStore. Tất cả quyền được bảo lưu. | GVHD: ThS. Nguyễn Văn A</p>
+        </div>
       </footer>
     </div>
   );
