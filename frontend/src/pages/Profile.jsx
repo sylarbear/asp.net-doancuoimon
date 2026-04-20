@@ -36,7 +36,7 @@ export default function Profile() {
     <div className="app-content fade-in">
       <h1 className="section-title">👤 Hồ sơ của tôi</h1>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      <div className="profile-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
         {/* User Info */}
         <Card style={{ borderRadius: 'var(--radius)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
