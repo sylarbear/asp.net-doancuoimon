@@ -101,6 +101,10 @@ export const adminAPI = {
   createVoucher: (data) => api.post('/admin/vouchers', data),
   updateVoucher: (id, data) => api.put(`/admin/vouchers/${id}`, data),
   deleteVoucher: (id) => api.delete(`/admin/vouchers/${id}`),
+  // Product CRUD
+  createProduct: (data) => api.post('/products', data),
+  updateProduct: (id, data) => api.put(`/products/${id}`, data),
+  deleteProduct: (id) => api.delete(`/products/${id}`),
 };
 
 export default api;
