@@ -116,7 +116,8 @@ npm run dev
 
 ## 👨‍💻 Tác giả
 
-- **Sinh viên**: [Tên sinh viên]
-- **MSSV**: [Mã số sinh viên]
+- **Sinh viên**: Phan Quang Thuật
+- **MSSV**: 2120110351
+- **GVHD**: Huỳnh Tấn Phát
 - **Môn học**: Đồ án cuối môn ASP.NET
 - **Năm**: 2026

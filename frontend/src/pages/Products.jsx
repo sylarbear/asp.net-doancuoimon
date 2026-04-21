@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Spin, Select, Input, Skeleton, Tag } from 'antd';
-import { SearchOutlined, FilterOutlined, SortAscendingOutlined } from '@ant-design/icons';
+import { SearchOutlined, FilterOutlined, SortAscendingOutlined, TagOutlined } from '@ant-design/icons';
 import { productAPI, categoryAPI } from '../api';
 import { formatVND } from '../utils';
 import { getProductImage } from '../productImages';
@@ -31,6 +31,7 @@ export default function Products() {
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [categoryId, setCategoryId] = useState(searchParams.get('category') || '');
+  const [brand, setBrand] = useState('');
   const [priceRange, setPriceRange] = useState('');
   const [sortBy, setSortBy] = useState('');
 
@@ -64,9 +65,17 @@ export default function Products() {
     }).finally(() => setLoading(false));
   }, [debouncedSearch, categoryId]);
 
-  // Client-side price filter + sort
+  // Extract unique brands from loaded products
+  const uniqueBrands = [...new Set(products.map(p => p.brand).filter(Boolean))].sort();
+
+  // Client-side brand + price filter + sort
   const getFilteredProducts = () => {
     let filtered = [...products];
+
+    // Brand filter
+    if (brand) {
+      filtered = filtered.filter(p => p.brand === brand);
+    }
 
     // Price filter
     if (priceRange) {
@@ -113,6 +122,16 @@ export default function Products() {
           options={categories.map(c => ({ label: c.name, value: String(c.id) }))}
         />
         <Select
+          placeholder="Thương hiệu"
+          value={brand || undefined}
+          onChange={v => setBrand(v || '')}
+          allowClear
+          style={{ minWidth: 160 }}
+          size="large"
+          suffixIcon={<TagOutlined />}
+          options={uniqueBrands.map(b => ({ label: b, value: b }))}
+        />
+        <Select
           placeholder="Khoảng giá"
           value={priceRange || undefined}
           onChange={v => setPriceRange(v || '')}
@@ -135,9 +154,10 @@ export default function Products() {
       </div>
 
       {/* Active filters summary */}
-      {(priceRange || sortBy) && (
+      {(brand || priceRange || sortBy) && (
         <div style={{ marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: 13, color: 'var(--gray-500)' }}>{filtered.length} sản phẩm</span>
+          {brand && <Tag closable onClose={() => setBrand('')} color="cyan">{brand}</Tag>}
           {priceRange && <Tag closable onClose={() => setPriceRange('')} color="blue">{PRICE_RANGES.find(r => r.value === priceRange)?.label}</Tag>}
           {sortBy && <Tag closable onClose={() => setSortBy('')} color="purple">{SORT_OPTIONS.find(s => s.value === sortBy)?.label}</Tag>}
         </div>

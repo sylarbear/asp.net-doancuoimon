@@ -95,13 +95,14 @@ export const paymentAPI = {
 // Admin
 export const adminAPI = {
   dashboard: () => api.get('/admin/dashboard/overview'),
+  revenueReport: (params) => api.get('/admin/dashboard/revenue', { params }),
+  topProducts: (count) => api.get('/admin/dashboard/top-products', { params: { count } }),
+  topCustomers: (count) => api.get('/admin/dashboard/top-customers', { params: { count } }),
+  orderStats: () => api.get('/admin/dashboard/order-stats'),
   getOrders: () => api.get('/orders/admin'),
   updateStatus: (id, data) => api.put(`/orders/${id}/status`, data),
   loyaltyStats: () => api.get('/admin/loyalty/stats'),
   loyaltyMembers: (tier) => api.get('/admin/loyalty/members', { params: { tier } }),
-  createVoucher: (data) => api.post('/admin/vouchers', data),
-  updateVoucher: (id, data) => api.put(`/admin/vouchers/${id}`, data),
-  deleteVoucher: (id) => api.delete(`/admin/vouchers/${id}`),
   // Product CRUD
   createProduct: (data) => api.post('/products', data),
   updateProduct: (id, data) => api.put(`/products/${id}`, data),

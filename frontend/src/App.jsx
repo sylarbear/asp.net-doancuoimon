@@ -74,7 +74,7 @@ function AppContent() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2026 TechnoStore. Tất cả quyền được bảo lưu. | GVHD: ThS. Nguyễn Văn A</p>
+          <p>© 2026 TechnoStore. Tất cả quyền được bảo lưu. | GVHD: Huỳnh Tấn Phát | SV: Phan Quang Thuật - 2120110351</p>
         </div>
       </footer>
     </div>
