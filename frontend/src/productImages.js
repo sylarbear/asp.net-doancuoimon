@@ -87,6 +87,11 @@ export function getProductImage(product) {
     return product.imageUrl;
   }
   
+  // If backend provides a local path (e.g. /images/products/xxx.jpg), use it
+  if (product.imageUrl && product.imageUrl.startsWith('/images/')) {
+    return product.imageUrl;
+  }
+  
   // Generate brand-styled SVG image
   return generateProductSVG(product);
 }
