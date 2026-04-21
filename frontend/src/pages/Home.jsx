@@ -1,10 +1,161 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Spin, Tag, Skeleton } from 'antd';
-import { RocketOutlined, SafetyCertificateOutlined, CustomerServiceOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { RocketOutlined, SafetyCertificateOutlined, CustomerServiceOutlined, ThunderboltOutlined, LeftOutlined, RightOutlined, FireOutlined, GiftOutlined, StarFilled } from '@ant-design/icons';
 import { productAPI, categoryAPI, voucherAPI } from '../api';
 import { formatVND } from '../utils';
 import { getProductImage } from '../productImages';
+
+// Banner data - quảng cáo sản phẩm nổi bật
+const bannerSlides = [
+  {
+    id: 1,
+    productId: 3,
+    title: 'Samsung Galaxy S25 Ultra',
+    subtitle: 'Flagship đỉnh cao 2026',
+    desc: 'Snapdragon 8 Elite • Camera 200MP • Galaxy AI',
+    price: 33990000,
+    badge: 'MỚI',
+    gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+    accentColor: '#4d8af0',
+    image: '/images/products/samsung-galaxy-s25-ultra.jpg',
+  },
+  {
+    id: 2,
+    productId: 6,
+    title: 'iPhone 16 Pro Max',
+    subtitle: 'Apple Intelligence',
+    desc: 'Chip A18 Pro • Camera 48MP 5x Zoom • Titanium',
+    price: 34490000,
+    badge: 'HOT',
+    gradient: 'linear-gradient(135deg, #1d1d1f 0%, #2d2d30 50%, #3a3a3d 100%)',
+    accentColor: '#a78bfa',
+    image: '/images/products/iphone-16-pro-max.jpg',
+  },
+  {
+    id: 3,
+    productId: 15,
+    title: 'ASUS ROG Strix G16',
+    subtitle: 'Gaming Monster',
+    desc: 'Core i9-14900HX • RTX 4070 • 240Hz QHD',
+    price: 39990000,
+    badge: 'GAMING',
+    gradient: 'linear-gradient(135deg, #0c0c1d 0%, #1a1a3e 50%, #2d1b69 100%)',
+    accentColor: '#ff4655',
+    image: '/images/products/asus-rog-strix-g16.jpg',
+  },
+  {
+    id: 4,
+    productId: 9,
+    title: 'Xiaomi 15 Ultra',
+    subtitle: 'Camera Leica chuyên nghiệp',
+    desc: 'Snapdragon 8 Elite • 16GB RAM • Leica 50MP',
+    price: 22990000,
+    badge: 'SALE',
+    gradient: 'linear-gradient(135deg, #1a0a00 0%, #3d1f00 50%, #ff6900 100%)',
+    accentColor: '#ff9f43',
+    image: '/images/products/xiaomi-15-ultra.jpg',
+  },
+  {
+    id: 5,
+    productId: 18,
+    title: 'Dell XPS 16',
+    subtitle: 'Ultrabook cao cấp nhất',
+    desc: 'Core Ultra 9 • RTX 4070 • OLED 3.2K',
+    price: 44990000,
+    badge: 'PREMIUM',
+    gradient: 'linear-gradient(135deg, #0a192f 0%, #0d2b4a 50%, #007db8 100%)',
+    accentColor: '#5bc0f5',
+    image: '/images/products/dell-xps-16.jpg',
+  },
+];
+
+// === BANNER CAROUSEL COMPONENT ===
+function BannerCarousel() {
+  const [current, setCurrent] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const timerRef = useRef(null);
+
+  const goTo = useCallback((index) => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrent(index);
+    setTimeout(() => setIsTransitioning(false), 600);
+  }, [isTransitioning]);
+
+  const next = useCallback(() => goTo((current + 1) % bannerSlides.length), [current, goTo]);
+  const prev = useCallback(() => goTo((current - 1 + bannerSlides.length) % bannerSlides.length), [current, goTo]);
+
+  // Auto-slide every 4 seconds
+  useEffect(() => {
+    timerRef.current = setInterval(next, 4000);
+    return () => clearInterval(timerRef.current);
+  }, [next]);
+
+  // Pause on hover
+  const pauseAuto = () => clearInterval(timerRef.current);
+  const resumeAuto = () => { timerRef.current = setInterval(next, 4000); };
+
+  const slide = bannerSlides[current];
+
+  return (
+    <section
+      className="hero-banner"
+      style={{ background: slide.gradient }}
+      onMouseEnter={pauseAuto}
+      onMouseLeave={resumeAuto}
+    >
+      {/* Decorative elements */}
+      <div className="banner-deco">
+        <div className="banner-circle c1" style={{ background: slide.accentColor }} />
+        <div className="banner-circle c2" style={{ background: slide.accentColor }} />
+        <div className="banner-circle c3" style={{ background: slide.accentColor }} />
+      </div>
+
+      <div className="banner-content">
+        {/* Left: Text content */}
+        <div className="banner-text" key={`text-${current}`}>
+          <span className="banner-badge" style={{ background: slide.accentColor }}>
+            {slide.badge === 'HOT' && <FireOutlined />}
+            {slide.badge === 'SALE' && <GiftOutlined />}
+            {slide.badge === 'PREMIUM' && <StarFilled />}
+            {' '}{slide.badge}
+          </span>
+          <h1 className="banner-title">{slide.title}</h1>
+          <p className="banner-subtitle">{slide.subtitle}</p>
+          <p className="banner-desc">{slide.desc}</p>
+          <div className="banner-price">{formatVND(slide.price)}</div>
+          <Link to={`/products/${slide.productId}`} className="banner-cta" style={{ borderColor: slide.accentColor, color: slide.accentColor }}>
+            Mua ngay →
+          </Link>
+        </div>
+
+        {/* Right: Product image */}
+        <div className="banner-image" key={`img-${current}`}>
+          <div className="banner-img-glow" style={{ background: slide.accentColor }} />
+          <img src={slide.image} alt={slide.title} />
+        </div>
+      </div>
+
+      {/* Navigation arrows */}
+      <button className="banner-arrow banner-arrow-left" onClick={prev} aria-label="Previous"><LeftOutlined /></button>
+      <button className="banner-arrow banner-arrow-right" onClick={next} aria-label="Next"><RightOutlined /></button>
+
+      {/* Dots indicator */}
+      <div className="banner-dots">
+        {bannerSlides.map((_, i) => (
+          <button
+            key={i}
+            className={`banner-dot ${i === current ? 'active' : ''}`}
+            style={i === current ? { background: slide.accentColor } : {}}
+            onClick={() => goTo(i)}
+            aria-label={`Slide ${i + 1}`}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -27,14 +178,8 @@ export default function Home() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="hero">
-        <h1 className="fade-in">Công nghệ <span>đỉnh cao</span><br />Giá cả tốt nhất</h1>
-        <p className="fade-in">Mua sắm điện thoại, laptop chính hãng với ưu đãi hấp dẫn. Tích điểm đổi voucher giảm đến 35%!</p>
-        <Link to="/products" className="btn-primary" style={{ fontSize: 17, padding: '14px 36px' }}>
-          <RocketOutlined /> Khám phá ngay
-        </Link>
-      </section>
+      {/* Banner Carousel */}
+      <BannerCarousel />
 
       <div className="app-content">
         {/* Vouchers */}
