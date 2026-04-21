@@ -16,31 +16,31 @@ INSERT INTO Users (FullName, Email, PasswordHash, Phone, [Address], [Role], Crea
 -- Ghi chú: Sau khi INSERT, các user mới sẽ có Id = 3, 4, 5, 6
 -- (vì Id 1 = Admin, Id 2 = Customer mặc định)
 
--- ========== 2. CẬP NHẬT ẢNH SẢN PHẨM (URLs thật) ==========
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-a16_1_.png' WHERE Id = 1;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s24-fe.png' WHERE Id = 2;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s25-ultra_2_.png' WHERE Id = 3;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-15_1_.png' WHERE Id = 4;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-16_1_.png' WHERE Id = 5;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-16-pro-max_1_.png' WHERE Id = 6;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-redmi-note-14-5g.png' WHERE Id = 7;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-15.png' WHERE Id = 8;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-15-ultra.png' WHERE Id = 9;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/o/p/oppo-a3.png' WHERE Id = 10;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/o/p/oppo-reno-13-5g.png' WHERE Id = 11;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/o/p/oppo-find-x8.png' WHERE Id = 12;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/a/s/asus-vivobook-15-oled_1_.png' WHERE Id = 13;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/a/s/asus-tuf-gaming-f15.png' WHERE Id = 14;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_5__6.png' WHERE Id = 15;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/e/dell-inspiron-15-3520.png' WHERE Id = 16;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/e/dell-latitude-5540.png' WHERE Id = 17;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/e/dell-xps-16-9640.png' WHERE Id = 18;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/e/lenovo-ideapad-3-15iah8.png' WHERE Id = 19;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/e/lenovo-thinkpad-e16-gen-5.png' WHERE Id = 20;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/e/lenovo-legion-pro-5-16irx9.png' WHERE Id = 21;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/h/p/hp-15-fd0234tu.png' WHERE Id = 22;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/h/p/hp-pavilion-15-eg2082tu.png' WHERE Id = 23;
-UPDATE Products SET ImageUrl = 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/h/p/hp-omen-16-xf0072ax.png' WHERE Id = 24;
+-- ========== 2. CẬP NHẬT ẢNH SẢN PHẨM (local images) ==========
+UPDATE Products SET ImageUrl = '/images/products/samsung-galaxy-a16.jpg' WHERE Id = 1;
+UPDATE Products SET ImageUrl = '/images/products/samsung-galaxy-s24-fe.jpg' WHERE Id = 2;
+UPDATE Products SET ImageUrl = '/images/products/samsung-galaxy-s25-ultra.jpg' WHERE Id = 3;
+UPDATE Products SET ImageUrl = '/images/products/iphone-15.jpg' WHERE Id = 4;
+UPDATE Products SET ImageUrl = '/images/products/iphone-16.jpg' WHERE Id = 5;
+UPDATE Products SET ImageUrl = '/images/products/iphone-16-pro-max.jpg' WHERE Id = 6;
+UPDATE Products SET ImageUrl = '/images/products/redmi-note-14.jpg' WHERE Id = 7;
+UPDATE Products SET ImageUrl = '/images/products/xiaomi-15.jpg' WHERE Id = 8;
+UPDATE Products SET ImageUrl = '/images/products/xiaomi-15-ultra.jpg' WHERE Id = 9;
+UPDATE Products SET ImageUrl = '/images/products/oppo-a3.jpg' WHERE Id = 10;
+UPDATE Products SET ImageUrl = '/images/products/oppo-reno-13.jpg' WHERE Id = 11;
+UPDATE Products SET ImageUrl = '/images/products/oppo-find-x8.jpg' WHERE Id = 12;
+UPDATE Products SET ImageUrl = '/images/products/asus-vivobook-15.jpg' WHERE Id = 13;
+UPDATE Products SET ImageUrl = '/images/products/asus-tuf-gaming-f15.jpg' WHERE Id = 14;
+UPDATE Products SET ImageUrl = '/images/products/asus-rog-strix-g16.jpg' WHERE Id = 15;
+UPDATE Products SET ImageUrl = '/images/products/dell-inspiron-15.jpg' WHERE Id = 16;
+UPDATE Products SET ImageUrl = '/images/products/dell-latitude-5540.jpg' WHERE Id = 17;
+UPDATE Products SET ImageUrl = '/images/products/dell-xps-16.jpg' WHERE Id = 18;
+UPDATE Products SET ImageUrl = '/images/products/lenovo-ideapad-3.jpg' WHERE Id = 19;
+UPDATE Products SET ImageUrl = '/images/products/lenovo-thinkpad-e16.jpg' WHERE Id = 20;
+UPDATE Products SET ImageUrl = '/images/products/lenovo-legion-pro-5.jpg' WHERE Id = 21;
+UPDATE Products SET ImageUrl = '/images/products/hp-15.jpg' WHERE Id = 22;
+UPDATE Products SET ImageUrl = '/images/products/hp-pavilion-15.jpg' WHERE Id = 23;
+UPDATE Products SET ImageUrl = '/images/products/hp-omen-16.jpg' WHERE Id = 24;
 
 -- ========== 3. SEED ĐƠN HÀNG (18 đơn, đa dạng trạng thái) ==========
 
