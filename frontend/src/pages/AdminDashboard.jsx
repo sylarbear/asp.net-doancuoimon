@@ -190,7 +190,50 @@ export default function AdminDashboard() {
 
   const PIE_COLORS = ['#f59e0b', '#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#ef4444'];
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 100 }}><Spin size="large" /></div>;
+  if (loading) return (
+    <div className="app-content" style={{ padding: 24 }}>
+      {/* Skeleton stats cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 32 }}>
+        {[...Array(5)].map((_, i) => (
+          <div key={i} style={{ background: 'white', borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+            <div style={{ width: 80, height: 14, background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', borderRadius: 4, marginBottom: 16, animation: 'shimmer 1.5s infinite' }} />
+            <div style={{ width: 120, height: 28, background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', borderRadius: 6, animation: 'shimmer 1.5s infinite' }} />
+          </div>
+        ))}
+      </div>
+      {/* Skeleton charts */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 24, marginBottom: 32 }}>
+        <div style={{ background: 'white', borderRadius: 12, padding: 24, height: 300, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <div style={{ width: 160, height: 18, background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', borderRadius: 4, marginBottom: 24, animation: 'shimmer 1.5s infinite' }} />
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, height: 200 }}>
+            {[60, 80, 45, 90, 70, 55, 85, 40, 75, 65].map((h, i) => (
+              <div key={i} style={{ flex: 1, height: `${h}%`, background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', borderRadius: '4px 4px 0 0', animation: 'shimmer 1.5s infinite' }} />
+            ))}
+          </div>
+        </div>
+        <div style={{ background: 'white', borderRadius: 12, padding: 24, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <div style={{ width: 180, height: 180, borderRadius: '50%', background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', animation: 'shimmer 1.5s infinite' }} />
+        </div>
+      </div>
+      {/* Skeleton table rows */}
+      <div style={{ background: 'white', borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+        <div style={{ width: 200, height: 18, background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', borderRadius: 4, marginBottom: 20, animation: 'shimmer 1.5s infinite' }} />
+        {[...Array(5)].map((_, i) => (
+          <div key={i} style={{ display: 'flex', gap: 16, padding: '14px 0', borderBottom: '1px solid #f0f0f0' }}>
+            {[100, 150, 80, 100, 80, 120].map((w, j) => (
+              <div key={j} style={{ width: w, height: 14, background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)', borderRadius: 4, animation: 'shimmer 1.5s infinite' }} />
+            ))}
+          </div>
+        ))}
+      </div>
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: -200px 0; }
+          100% { background-position: 200px 0; }
+        }
+      `}</style>
+    </div>
+  );
 
   const statusOptions = {
     Pending: ['Confirmed', 'Cancelled'],
