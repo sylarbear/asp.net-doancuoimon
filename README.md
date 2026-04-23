@@ -7,6 +7,15 @@
 [![Ant Design](https://img.shields.io/badge/Ant%20Design-5-0170FE?logo=antdesign)](https://ant.design/)
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-CC2927?logo=microsoftsqlserver)](https://www.microsoft.com/en-us/sql-server)
 
+## 🌐 Live Demo
+
+| Service | URL |
+|---------|-----|
+| 🖥️ **Frontend** (Giao diện) | https://technostore-frontend.onrender.com |
+| ⚙️ **Backend API** (Swagger) | https://technostore-api.onrender.com |
+
+> ⚠️ **Lưu ý:** Hosting miễn phí (Render Free Tier), lần đầu truy cập có thể mất 30-60 giây để khởi động.
+
 ## 📋 Giới thiệu
 
 TechnoStore là nền tảng thương mại điện tử chuyên bán điện thoại & laptop, được xây dựng với kiến trúc **Clean Architecture**. Hệ thống bao gồm đầy đủ tính năng quản lý sản phẩm, giỏ hàng, đơn hàng, chương trình khách hàng thân thiết (Loyalty), và thanh toán chuyển khoản ngân hàng.
