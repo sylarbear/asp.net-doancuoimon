@@ -1,0 +1,276 @@
+# 🎯 HƯỚNG DẪN DEMO & BẢO VỆ ĐỒ ÁN TECHNOSTORE
+
+---
+
+## PHẦN 1: KỊCH BẢN DEMO (15 phút)
+
+### ⏱️ Phân bổ thời gian
+
+| Phần | Thời gian | Nội dung |
+|------|-----------|----------|
+| Mở đầu | 1 phút | Giới thiệu bản thân + đề tài |
+| Kiến trúc | 2 phút | Clean Architecture + công nghệ |
+| Demo khách hàng | 7 phút | Trang chủ → Sản phẩm → Chi tiết → Giỏ → Đặt hàng |
+| Demo admin | 3 phút | Dashboard → CRUD → Excel |
+| Swagger API | 1 phút | Show API docs |
+| Kết luận | 1 phút | Tổng kết + hướng phát triển |
+
+---
+
+### 📋 KỊCH BẢN CHI TIẾT
+
+#### 🔷 Bước 1: Mở đầu (1 phút)
+
+> *"Chào thầy/cô, em là Phan Quang Thuật, MSSV 2120110351. Đồ án của em là **TechnoStore** — hệ thống bán hàng công nghệ trực tuyến, xây dựng bằng ASP.NET Core 9 và React 19."*
+
+#### 🔷 Bước 2: Giới thiệu kiến trúc (2 phút)
+
+Mở file báo cáo hoặc slide, chỉ vào sơ đồ kiến trúc:
+
+> *"Dự án sử dụng kiến trúc **Clean Architecture** gồm 4 tầng:"*
+
+- **Domain** → Entities (User, Product, Order...)
+- **Application** → Services + DTOs (business logic)
+- **Infrastructure** → EF Core DbContext + Repositories
+- **API** → Controllers (RESTful endpoints)
+
+> *"Frontend là React SPA, giao tiếp với backend qua REST API, xác thực bằng JWT Bearer Token."*
+
+#### 🔷 Bước 3: Demo phía Khách hàng (7 phút)
+
+**3.1 Trang chủ** (http://localhost:5173/)
+- Chỉ vào banner carousel: *"Banner quảng cáo tự động chuyển slide mỗi 4 giây"*
+- Scroll xuống: *"Voucher đang có, feature highlights, sản phẩm nổi bật"*
+
+**3.2 Trang sản phẩm** (click "Sản phẩm")
+- *"24 sản phẩm, 8 thương hiệu"*
+- Demo lọc: chọn danh mục **Laptop** → chọn brand **Dell** → *"Bộ lọc hoạt động real-time"*
+- Demo search: gõ **"iPhone"** ở header → Enter
+
+**3.3 Chi tiết sản phẩm** (click Samsung Galaxy S25 Ultra)
+- *"Breadcrumb, tags, thông số kỹ thuật tự động parse"*
+- Click tab **"Đánh giá"** → *"Có biểu đồ phân bổ rating"*
+- Click **"Thêm vào giỏ"** → hiện thông báo thành công
+
+**3.4 Đăng nhập** (nếu chưa login)
+- Nhập: `customer@technostore.com` / `Customer@123`
+- *"Xác thực JWT, token lưu localStorage"*
+
+**3.5 Giỏ hàng** (click icon giỏ)
+- *"Có thể thay đổi số lượng, xóa, áp voucher"*
+- Nhập mã voucher: **SALE15** → *"Giảm 15%"*
+- Điền form checkout:
+  - Tên: Nguyễn Văn A
+  - SĐT: 0901234567
+  - Địa chỉ: 123 Nguyễn Văn Linh, Q7, TP.HCM
+- Click **"Đặt hàng"**
+
+**3.6 Đơn hàng** (tự động chuyển sang trang đơn hàng)
+- *"Status tracker: Pending → Confirmed → Shipping → Delivered → Completed"*
+
+#### 🔷 Bước 4: Demo Admin (3 phút)
+
+- Đăng xuất → Đăng nhập admin: `admin@technostore.com` / `Admin@123`
+- Vào **Dashboard**:
+  - *"5 thẻ thống kê, biểu đồ cột doanh thu, biểu đồ tròn trạng thái"*
+- Click tab **"Đơn hàng"**:
+  - Cập nhật trạng thái 1 đơn: Pending → Confirmed
+  - Click **"Xuất Excel"** → *"Download file .xlsx"*
+- Click tab **"Sản phẩm"**:
+  - Click **"Thêm SP"** → điền form → Lưu
+- Click tab **"Loyalty"**:
+  - *"Thống kê thành viên theo hạng"*
+
+#### 🔷 Bước 5: Swagger API (1 phút)
+
+- Mở http://localhost:5246/swagger
+- *"Tài liệu API tự động, có JWT Bearer auth"*
+- Mở 1 endpoint demo (GET /api/products)
+
+#### 🔷 Bước 6: Kết luận (1 phút)
+
+> *"Tóm lại, TechnoStore là hệ thống e-commerce hoàn chỉnh với Clean Architecture, đầy đủ CRUD, thanh toán, tích điểm loyalty, và admin dashboard. Hướng phát triển tiếp theo là tích hợp VNPay/MoMo và deploy lên cloud."*
+
+---
+
+## PHẦN 2: CÂU HỎI THƯỜNG GẶP & CÁCH TRẢ LỜI
+
+### 📌 Nhóm 1: Kiến trúc & Thiết kế
+
+#### ❓ "Clean Architecture là gì? Tại sao dùng?"
+
+> **Trả lời:** Clean Architecture là kiến trúc phần mềm chia ứng dụng thành các tầng độc lập:
+> - **Domain** (lõi): chứa entity, không phụ thuộc gì
+> - **Application**: business logic, chỉ phụ thuộc Domain
+> - **Infrastructure**: triển khai cụ thể (database, external services)
+> - **API**: nhận request từ client
+>
+> **Lợi ích:** Dễ test, dễ thay đổi database (từ SQL Server sang PostgreSQL chỉ sửa Infrastructure), dễ bảo trì.
+
+#### ❓ "Repository Pattern là gì?"
+
+> **Trả lời:** Repository Pattern tạo một lớp trung gian giữa business logic và data access. Thay vì Service trực tiếp gọi DbContext, nó gọi qua Repository → dễ thay đổi nguồn dữ liệu, dễ mock khi test.
+
+#### ❓ "Unit of Work là gì?"
+
+> **Trả lời:** Unit of Work quản lý transaction. Đảm bảo nhiều thao tác database trong 1 business action đều được commit hoặc rollback cùng lúc. Ví dụ: khi đặt hàng, cần tạo Order + trừ stock + tạo loyalty points → tất cả phải thành công hoặc thất bại cùng lúc.
+
+#### ❓ "DTO là gì? Tại sao không trả entity trực tiếp?"
+
+> **Trả lời:** DTO (Data Transfer Object) là object chỉ chứa dữ liệu cần thiết để truyền qua API. Không trả entity vì:
+> - Tránh lộ dữ liệu nhạy cảm (password hash)
+> - Tránh circular reference khi serialize
+> - Kiểm soát chính xác data shape trả về
+
+---
+
+### 📌 Nhóm 2: Backend & API
+
+#### ❓ "JWT là gì? Hoạt động thế nào?"
+
+> **Trả lời:** JWT (JSON Web Token) là chuẩn xác thực stateless:
+> 1. User đăng nhập → server tạo JWT token chứa userId, role, thời hạn
+> 2. Client lưu token ở localStorage
+> 3. Mỗi request kèm header: `Authorization: Bearer <token>`
+> 4. Server verify token bằng secret key → xác định user
+>
+> **Ưu điểm:** Không cần lưu session trên server, dễ scale.
+
+#### ❓ "Middleware là gì?"
+
+> **Trả lời:** Middleware là các lớp xử lý nằm trong pipeline request. Mỗi request đi qua tất cả middleware theo thứ tự. Trong dự án em dùng:
+> - `ExceptionHandlingMiddleware` → bắt tất cả exception, trả JSON error
+> - `UseAuthentication` → verify JWT token
+> - `UseAuthorization` → kiểm tra quyền (Admin/Customer)
+
+#### ❓ "Code-First Migration là gì?"
+
+> **Trả lời:** Là cách tạo database từ code C#. Em định nghĩa entity (Product.cs, Order.cs...) → EF Core tự tạo bảng tương ứng. Khi thay đổi entity → chạy `dotnet ef migrations add` → EF tạo script migration → `dotnet ef database update` để cập nhật DB.
+
+#### ❓ "CORS là gì? Tại sao cần?"
+
+> **Trả lời:** CORS (Cross-Origin Resource Sharing) cho phép frontend (port 5173) gọi API backend (port 5246). Mặc định browser chặn cross-origin request vì lý do bảo mật. Em cấu hình `AllowAll` policy trong development.
+
+---
+
+### 📌 Nhóm 3: Frontend & React
+
+#### ❓ "React hoạt động thế nào?"
+
+> **Trả lời:** React là thư viện UI dựa trên component. Mỗi component là 1 function trả về JSX (HTML + JS). React dùng Virtual DOM — khi state thay đổi, React so sánh Virtual DOM cũ và mới, chỉ update phần thực sự thay đổi → nhanh hơn thao tác DOM trực tiếp.
+
+#### ❓ "Context API dùng để làm gì?"
+
+> **Trả lời:** Context API chia sẻ state giữa các component mà không cần truyền props qua nhiều tầng. Em dùng AuthContext để chia sẻ thông tin user (đã login chưa, role gì) cho toàn bộ app.
+
+#### ❓ "Axios là gì? Khác fetch thế nào?"
+
+> **Trả lời:** Axios là HTTP client. Khác fetch ở chỗ:
+> - Tự động serialize/parse JSON
+> - Hỗ trợ interceptors (em dùng để tự gắn JWT token vào mọi request)
+> - Xử lý error tốt hơn (tự throw khi status >= 400)
+
+---
+
+### 📌 Nhóm 4: Database
+
+#### ❓ "Tại sao dùng SQL Server?"
+
+> **Trả lời:** SQL Server là RDBMS mạnh, tích hợp tốt với .NET ecosystem qua Entity Framework Core. LocalDB nhẹ, không cần cài service, phù hợp development. Production có thể chuyển sang SQL Server full hoặc Azure SQL.
+
+#### ❓ "Giải thích quan hệ giữa các bảng?"
+
+> **Trả lời:**
+> - User (1) → (N) Orders → (N) OrderDetails → (1) Product
+> - User (1) → (N) CartItems → (1) Product
+> - User (1) → (N) Reviews → (1) Product
+> - User (1) → (N) LoyaltyPoints
+> - Product (N) → (1) Category
+
+#### ❓ "Seed Data là gì?"
+
+> **Trả lời:** Seed Data là dữ liệu khởi tạo ban đầu. Khi database trống, SeedData.cs sẽ tự tạo admin account, categories, 24 sản phẩm demo. File seed_data.sql bổ sung thêm customers, orders, reviews cho demo đầy đủ.
+
+---
+
+### 📌 Nhóm 5: Tính năng nâng cao
+
+#### ❓ "Hệ thống Loyalty hoạt động thế nào?"
+
+> **Trả lời:** Mỗi đơn hàng hoàn thành, khách được tích điểm (mỗi 100.000₫ = 1 điểm). Tổng điểm quyết định hạng:
+> - Bronze (0đ) → Silver (500đ, -2%) → Gold (2000đ, -5%) → Diamond (5000đ, -10%)
+> - Ưu đãi tự động áp dụng khi checkout
+
+#### ❓ "Voucher validate thế nào?"
+
+> **Trả lời:** Khi áp voucher, server kiểm tra:
+> 1. Mã có tồn tại + đang active không
+> 2. Còn trong thời hạn không (startDate ≤ now ≤ endDate)
+> 3. Chưa hết lượt sử dụng (usedCount < usageLimit)
+> 4. Đơn hàng >= đơn tối thiểu (minOrderAmount)
+> 5. Tính giảm giá: Min(discountValue, maxDiscountAmount)
+
+#### ❓ "Banner carousel tự làm hay dùng thư viện?"
+
+> **Trả lời:** Em tự code bằng React hooks (useState, useEffect, useCallback, useRef). Dùng setInterval cho auto-slide, pause khi hover, CSS animation cho hiệu ứng chuyển slide.
+
+---
+
+## PHẦN 3: NHỮNG GÌ CẦN HỌC / ÔN
+
+### 🟢 Bắt buộc phải hiểu (hay hỏi nhất)
+
+| Chủ đề | File tham khảo |
+|--------|----------------|
+| Clean Architecture 4 tầng | Cấu trúc thư mục src/ |
+| JWT Authentication | AuthController.cs, AuthContext.jsx |
+| Repository + Unit of Work | IRepository.cs, IUnitOfWork.cs |
+| Entity Framework Code-First | TechnoStoreDbContext.cs, Entities/ |
+| Middleware pipeline | Program.cs, ExceptionHandlingMiddleware.cs |
+| React Component + Hooks | Home.jsx, ProductDetail.jsx |
+| REST API design | Tất cả Controllers |
+
+### 🟡 Nên biết (thỉnh thoảng hỏi)
+
+| Chủ đề | Ghi nhớ |
+|--------|---------|
+| CORS | Cross-origin, cấu hình trong Program.cs |
+| DTO Pattern | Tách entity ↔ API response |
+| BCrypt | Hash 1 chiều, không thể decrypt |
+| Dependency Injection | AddScoped trong Program.cs |
+| Axios Interceptors | Tự gắn token, redirect khi 401 |
+
+### 🔴 Bonus (gây ấn tượng)
+
+| Chủ đề | Nói gì |
+|--------|--------|
+| Performance | "Em dùng lazy loading cho images, pagination cho queries" |
+| Security | "Password hash BCrypt, JWT expiry, input validation" |
+| Scalability | "Clean Architecture cho phép thay đổi DB mà không ảnh hưởng business logic" |
+
+---
+
+## PHẦN 4: MẸO KHI BÁO CÁO
+
+### ✅ NÊN LÀM
+1. **Demo trực tiếp** — không dùng video/ảnh chụp, chạy app thật
+2. **Chuẩn bị sẵn data** — chạy seed_data.sql trước
+3. **Mở sẵn 2 tab** — Frontend (5173) + Swagger (5246/swagger)
+4. **Nói chậm, rõ ràng** — giải thích mỗi bước đang làm gì
+5. **Highlight điểm mạnh** — Clean Architecture, Loyalty system, Skeleton loading
+
+### ❌ KHÔNG NÊN
+1. Đọc slide/báo cáo nguyên văn
+2. Demo quá nhanh không giải thích
+3. Nói "em không biết" — thay bằng "em chưa tìm hiểu sâu phần này"
+4. Quên đăng nhập trước khi demo giỏ hàng
+5. Để app crash khi demo (test trước 30 phút!)
+
+### 🔥 CHECKLIST TRƯỚC KHI DEMO
+- [ ] Backend đang chạy (`dotnet run`)
+- [ ] Frontend đang chạy (`npm run dev`)
+- [ ] Database có đầy đủ data (chạy seed_data.sql)
+- [ ] Đã test thử login cả 2 account
+- [ ] Đã test thêm giỏ hàng, đặt hàng
+- [ ] Swagger accessible tại /swagger
+- [ ] File Word đã in/copy sẵn
