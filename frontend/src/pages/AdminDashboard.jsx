@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, Spin, Tag, Table, Select, Statistic, message, Button, Modal, Form, Input, InputNumber, Popconfirm, DatePicker } from 'antd';
-import { ShoppingCartOutlined, UserOutlined, DollarOutlined, TrophyOutlined, TeamOutlined, PlusOutlined, EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
+import { Card, Spin, Tag, Table, Select, Statistic, message, Button, Modal, Form, Input, InputNumber, Popconfirm, DatePicker, Upload, Image, Segmented } from 'antd';
+import { ShoppingCartOutlined, UserOutlined, DollarOutlined, TrophyOutlined, TeamOutlined, PlusOutlined, EditOutlined, DeleteOutlined, DownloadOutlined, UploadOutlined, LinkOutlined, PictureOutlined } from '@ant-design/icons';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { adminAPI, productAPI, categoryAPI } from '../api';
 import { formatVND, getStatusColor, getStatusText } from '../utils';
@@ -22,6 +22,9 @@ export default function AdminDashboard() {
   const [voucherModal, setVoucherModal] = useState({ open: false, editing: null });
   const [form] = Form.useForm();
   const [voucherForm] = Form.useForm();
+  const [imageMode, setImageMode] = useState('upload');
+  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const loadAll = () => {
     setLoading(true);
@@ -58,8 +61,31 @@ export default function AdminDashboard() {
   // === PRODUCT CRUD ===
   const openProductModal = (product = null) => {
     setProductModal({ open: true, editing: product });
-    if (product) form.setFieldsValue(product);
-    else form.resetFields();
+    if (product) {
+      form.setFieldsValue(product);
+      setUploadedImageUrl(product.imageUrl || '');
+      setImageMode(product.imageUrl ? 'url' : 'upload');
+    } else {
+      form.resetFields();
+      setUploadedImageUrl('');
+      setImageMode('upload');
+    }
+  };
+
+  const handleImageUpload = async (file) => {
+    setUploading(true);
+    try {
+      const res = await adminAPI.uploadImage(file);
+      const url = res.data.data;
+      setUploadedImageUrl(url);
+      form.setFieldsValue({ imageUrl: url });
+      message.success('Upload ảnh thành công!');
+    } catch (err) {
+      message.error(err.response?.data?.message || 'Lỗi upload ảnh');
+    } finally {
+      setUploading(false);
+    }
+    return false; // Prevent auto upload
   };
 
   const handleProductSubmit = async (values) => {
@@ -408,7 +434,47 @@ export default function AdminDashboard() {
                 </Form.Item>
               </div>
               <Form.Item name="description" label="Mô tả"><Input.TextArea rows={3} /></Form.Item>
-              <Form.Item name="imageUrl" label="URL ảnh (tùy chọn)"><Input placeholder="https://..." /></Form.Item>
+              <Form.Item label="Hình ảnh sản phẩm">
+                <Segmented
+                  value={imageMode}
+                  onChange={setImageMode}
+                  options={[
+                    { label: <span><UploadOutlined /> Tải từ máy</span>, value: 'upload' },
+                    { label: <span><LinkOutlined /> Nhập URL</span>, value: 'url' },
+                  ]}
+                  style={{ marginBottom: 12 }}
+                />
+                {imageMode === 'upload' ? (
+                  <div>
+                    <Upload
+                      accept="image/*"
+                      showUploadList={false}
+                      beforeUpload={handleImageUpload}
+                      disabled={uploading}
+                    >
+                      <Button icon={<UploadOutlined />} loading={uploading} style={{ width: '100%', height: 44, borderStyle: 'dashed' }}>
+                        {uploading ? 'Đang tải lên...' : 'Chọn ảnh từ máy (JPG, PNG, WebP - Tối đa 5MB)'}
+                      </Button>
+                    </Upload>
+                    {uploadedImageUrl && (
+                      <div style={{ marginTop: 8, padding: 8, border: '1px solid #e8e8e8', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <Image src={uploadedImageUrl} width={60} height={60} style={{ objectFit: 'contain', borderRadius: 6 }} />
+                        <span style={{ flex: 1, fontSize: 12, color: '#888', wordBreak: 'break-all' }}>{uploadedImageUrl}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Form.Item name="imageUrl" noStyle>
+                    <Input placeholder="https://example.com/image.jpg" onChange={e => setUploadedImageUrl(e.target.value)} />
+                  </Form.Item>
+                )}
+                {imageMode === 'url' && uploadedImageUrl && (
+                  <div style={{ marginTop: 8 }}>
+                    <Image src={uploadedImageUrl} width={60} height={60} style={{ objectFit: 'contain', borderRadius: 6 }} fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN88P/BfwAJhAPk3KBNhQAAAABJRU5ErkJggg==" />
+                  </div>
+                )}
+                <Form.Item name="imageUrl" hidden><Input /></Form.Item>
+              </Form.Item>
               <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                 <Button onClick={() => setProductModal({ open: false, editing: null })}>Hủy</Button>
                 <Button type="primary" htmlType="submit" style={{ background: 'var(--accent)' }}>{productModal.editing ? 'Cập nhật' : 'Thêm mới'}</Button>

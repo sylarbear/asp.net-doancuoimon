@@ -116,6 +116,7 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseCors("AllowAll");
+app.UseStaticFiles(); // Serve uploaded images from wwwroot/
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

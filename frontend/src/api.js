@@ -112,6 +112,12 @@ export const adminAPI = {
   createVoucher: (data) => api.post('/admin/vouchers', data),
   updateVoucher: (id, data) => api.put(`/admin/vouchers/${id}`, data),
   deleteVoucher: (id) => api.delete(`/admin/vouchers/${id}`),
+  // Upload
+  uploadImage: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/upload/image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+  },
 };
 
 export default api;
