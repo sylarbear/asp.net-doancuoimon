@@ -48,8 +48,9 @@ namespace TechnoStore.API.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            // Return URL
-            var url = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
+            // Return URL - use X-Forwarded-Proto for HTTPS behind reverse proxy (Render)
+            var scheme = Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? Request.Scheme;
+            var url = $"{scheme}://{Request.Host}/uploads/{fileName}";
             return Ok(new { success = true, data = url, message = "Upload thành công!" });
         }
     }
