@@ -12,7 +12,7 @@
 | Service | URL |
 |---------|-----|
 | 🖥️ **Frontend** (Giao diện) | https://technostore-frontend.onrender.com |
-| ⚙️ **Backend API** (Swagger) | https://technostore-api.onrender.com |
+| ⚙️ **Backend API** (Swagger) | https://technostore-api.onrender.com/swagger/index.html |
 
 > ⚠️ **Lưu ý:** Hosting miễn phí (Render Free Tier), lần đầu truy cập có thể mất 30-60 giây để khởi động.
 
